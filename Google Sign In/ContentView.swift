@@ -11,9 +11,11 @@ import MapKit
 
 import Firebase
 import GoogleSignIn
+import FirebaseFirestore
 
 struct ContentView: View {
     @State var authenticationDidFail: Bool = false
+    
     var body: some View {
             
             ZStack {
@@ -40,9 +42,10 @@ struct ContentView: View {
 struct LoginScreen: View{
     var body: some View{
         NavigationView{
-            if Auth.auth().currentUser?.uid != nil{
+            if Auth.auth().currentUser?.uid == nil{ //Change to != After User is added to DB
                 NavigationLink(destination: HomeView()){
                     Text("Login")
+                    
                 }
             }
             else{
@@ -197,6 +200,40 @@ class LoginViewController: UIViewController{
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
         GIDSignIn.sharedInstance()?.signIn()
+        
+        //Checks if user is already in database. If not add them
+        let db = Firestore.firestore()
+        let userRef = db.collection("users")
+        var ref: DocumentReference? = nil
+        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        docRef.getDocument { (document, error) in
+            if let document = document {
+
+
+                if document.exists{
+                    print("Document data: \(document.data())")
+
+                } else {
+
+                print("Document does not exist")
+
+                    
+                    userRef.document(Auth.auth().currentUser!.uid).setData([
+                        "profileName": Auth.auth().currentUser?.displayName as Any,
+                        "recentSurvey": false,
+                        "badge": "Red"
+                    ])
+
+
+                }
+            }
+        }
+        //ref = db.collection("users").addDocument(data: [
+          //  "userid": Auth.auth().currentUser?.uid as Any,
+          //  "recentSurvey": false,
+          //  "badge": "Green"
+        // ])
         
     }
 }
