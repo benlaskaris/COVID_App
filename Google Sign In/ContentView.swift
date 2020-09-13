@@ -212,7 +212,8 @@ struct SymptomView: View {
                     "smell": self.Survey.smell,
                     "vomit": self.Survey.vomit,
                     "fatigue": self.Survey.fatigue,
-                    "aches": self.Survey.aches
+                    "aches": self.Survey.aches,
+                    "admin": false
 
                 ])
             }) {
