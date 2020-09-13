@@ -12,8 +12,12 @@ import MapKit
 import Firebase
 import GoogleSignIn
 
+
 struct ContentView: View {
     @State var authenticationDidFail: Bool = false
+    
+    
+    
     var body: some View {
             
             ZStack {
@@ -40,15 +44,20 @@ struct ContentView: View {
 struct LoginScreen: View{
     var body: some View{
         NavigationView{
-            if Auth.auth().currentUser?.uid != nil{
+            if Auth.auth().currentUser?.uid == nil
+            { //TODO: Change to != After User is added to DB
                 NavigationLink(destination: HomeView()){
                     Text("Login")
-                }
+
+                }.navigationBarTitle("")
+            .navigationBarHidden(true)
             }
-            else{
+            else
+            {
                 NavigationLink(destination: GoogleScreen()){
                     Text("Login")
-                }
+                }.navigationBarTitle("")
+                .navigationBarHidden(true)
             }
         }
     }
@@ -87,46 +96,186 @@ struct HomeView: View {
     @State var SymptomModal: Bool = false
     @State var TestingModal: Bool = false
     
-    var body: some View{
-        //...
-        VStack{
-        Button(action: {
-            self.SymptomModal = true
-        }) {
-            Text("Report my symptoms").font(.headline)
-        }.sheet(isPresented: self.$SymptomModal) {
-            SymptomView(SymptomModal: self.$SymptomModal)
-        }
-            
+    var body: some View {
         
-        Button("Find Testing Locations") {
-            self.TestingModal = true
-        }.sheet(isPresented: $TestingModal, content: {
-            MapView().frame(height: 300)
-        })
+        VStack(alignment: .leading) {
+            VStack(alignment: .center) {
+                HStack {
+                    Spacer()
+                }
+                Image("covid-icon").resizable()
+                .frame(width: 300.0, height: 300.0).clipShape(Circle()).overlay(
+                Circle().stroke(Color.gray, lineWidth: 4))
+                .shadow(radius: 10).padding(.bottom, 50).offset(y:30)
+            }
+            
+            VStack(alignment: .center) {
+                HStack {
+                    Spacer()
+                }
+                
+                VStack(alignment: .leading) {
+                Text("COVID-19 Symptom Check").bold().font(.title)
+                Text("By Terriers, for Terriers").bold()
+                }
+            
+                .padding()
+                
+                Button(action: {
+                    self.SymptomModal = true
+                }) {
+                    Text("Report my symptoms").font(.title)
+                }.sheet(isPresented: self.$SymptomModal) {
+                    SymptomView(SymptomModal: self.$SymptomModal)
+                }
+                    
+                
+                Button(action: {
+                    self.TestingModal = true
+                }) {
+                    Text("Find Testing Locations").font(.title)
+                }.sheet(isPresented: self.$TestingModal) {
+                    TestingView()
+                }
+            }
+        Spacer()
         }
     }
 }
 
+
+
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
+    
+    @EnvironmentObject var Survey: SurveyAnswers;
     
     var body: some View {
         VStack {
             
-            Text("Screen to report symptoms")
-            CheckView().frame(height: 300)
-            Button("Send Responses") {
+            Text("Daily Symptom Survey").font(.largeTitle).bold().padding()
+            
+            CheckView(symptom: "Fever of 100ºF or feeling unusually hot", symptomNumber: 1)
+            
+            CheckView(symptom: "New or worsening cough", symptomNumber: 2)
+            
+            CheckView(symptom: "Difficulty breathing", symptomNumber: 3)
+            
+            CheckView(symptom: "Sore throat", symptomNumber: 4)
+            
+            CheckView(symptom: "Loss of smell, taste, or appetite", symptomNumber: 5)
+            
+            CheckView(symptom: "Vomiting", symptomNumber: 6)
+            
+            CheckView(symptom: "Severe Fatigue", symptomNumber: 7)
+            
+            CheckView(symptom: "Severe Body Aches", symptomNumber: 8)
+            
+
+
+            Button(action: {
                 self.SymptomModal.toggle()
+                let db = Firestore.firestore()
+                let userRef = db.collection("users")
+                userRef.document(Auth.auth().currentUser!.uid).setData([
+                    "profileName": Auth.auth().currentUser?.displayName as Any,
+                    "recentSurvey": false,
+                    "badge": "Red",
+                    "fever": self.Survey.fever,
+                    "cough": self.Survey.cough,
+                    "breathing": self.Survey.breathing,
+                    "throat": self.Survey.throat,
+                    "smell": self.Survey.smell,
+                    "vomit": self.Survey.vomit,
+                    "fatigue": self.Survey.fatigue,
+                    "aches": self.Survey.aches
+
+                ])
+            }) {
+                Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
         }
-//            Form {
-//                Group {
-//                    Text("Please enter your name FORM")
-//                }
-//            }
-            
+    }
+}
+
+
+struct TestingView: View {
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Find COVID-19 Testing Sites").font(.largeTitle).bold().padding(.top, 50).padding(.horizontal)
+            MapView().frame(height: 200)
+                
+                NavigationView {
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            VStack(alignment: .leading) {
+                                NavigationLink(destination: DetailView()) {
+                                    Text("More Info")
+                                }
+                                Text("Agganis Arena")
+                                    .font(.title)
+                                HStack(alignment: .top) {
+                                    Text("Charles River Campus")
+                                        .font(.subheadline)
+                                    Spacer()
+                                    Text("925 Comm. Ave")
+                                        .font(.subheadline)
+                                }
+                            }.padding()
+                            
+                            VStack(alignment: .leading) {
+                                NavigationLink(destination: DetailView()) {
+                                    Text("More Info")
+                                }
+                                    
+                                    Text("808 Gallery")
+                                        .font(.title)
+                                    HStack(alignment: .top) {
+                                        Text("Charles River Campus")
+                                            .font(.subheadline)
+                                        Spacer()
+                                        Text("808 Comm. Ave")
+                                            .font(.subheadline)
+                                    }
+                            }.padding()
+                            
+                            VStack(alignment: .leading) {
+                                NavigationLink(destination: DetailView()) {
+                                    Text("More Info")
+                                }
+                                    
+                                    Text("Kilachand Center for Life Sciences")
+                                        .font(.title)
+                                    HStack(alignment: .top) {
+                                        Text("Charles River Campus")
+                                            .font(.subheadline)
+                                        Spacer()
+                                        Text("610 Comm. Ave")
+                                            .font(.subheadline)
+                                    }
+                            }.padding()
+                            
+                            VStack(alignment: .leading) {
+                                NavigationLink(destination: DetailView()) {
+                                    Text("More Info")
+                                }
+                                    
+                                    Text("BUMC")
+                                        .font(.title)
+                                    HStack(alignment: .top) {
+                                        Text("Medical Campus")
+                                            .font(.subheadline)
+                                        Spacer()
+                                        Text("72 E. Concord St")
+                                            .font(.subheadline)
+                                    }
+                            }.padding()
+                        }.navigationBarTitle("")
+                        .navigationBarHidden(true)
+                    }
+            }
         }
+    }
 }
 
 struct MapView: UIViewRepresentable {
@@ -136,29 +285,121 @@ struct MapView: UIViewRepresentable {
 
     func updateUIView(_ uiView: MKMapView, context: Context) {
         let coordinate = CLLocationCoordinate2D(
-            latitude: 34.011286, longitude: -116.166868)
-        let span = MKCoordinateSpan(latitudeDelta: 2.0, longitudeDelta: 2.0)
+            latitude: 42.3505, longitude: -71.1054)
+        let span = MKCoordinateSpan(latitudeDelta: 0.04, longitudeDelta: 0.04)
         let region = MKCoordinateRegion(center: coordinate, span: span)
         uiView.setRegion(region, animated: true)
+        
+//        Agganis Arena
+        let AgganisArena = CLLocationCoordinate2D(latitude: 42.3522, longitude: -71.1177)
+        let AGGannotation = MKPointAnnotation()
+        AGGannotation.coordinate = AgganisArena
+        AGGannotation.title = "Agganis Arena"
+        AGGannotation.subtitle = "Charles River Campus"
+        uiView.addAnnotation(AGGannotation)
+        
+//        808 Gallery
+        let EightOhEight = CLLocationCoordinate2D(latitude: 42.35015, longitude: -71.11173)
+        let EGHTannotation = MKPointAnnotation()
+        EGHTannotation.coordinate = EightOhEight
+        EGHTannotation.title = "808 Gallery"
+        EGHTannotation.subtitle = "Charles River Campus"
+        uiView.addAnnotation(EGHTannotation)
+        
+//        Kilachand
+        let Kilachand = CLLocationCoordinate2D(latitude: 42.349096, longitude: -71.101471)
+        let KLCHND = MKPointAnnotation()
+        KLCHND.coordinate = Kilachand
+        KLCHND.title = "Kilachand Center for Life Sciences"
+        KLCHND.subtitle = "Charles River Campus"
+        uiView.addAnnotation(KLCHND)
+        
+//        BUMC
+        let MedicalCampus = CLLocationCoordinate2D(latitude: 42.336676, longitude: -71.072470)
+        let bmc = MKPointAnnotation()
+        bmc.coordinate = MedicalCampus
+        bmc.title = "BUMC"
+        bmc.subtitle = "Medical Campus"
+        uiView.addAnnotation(bmc)
+    }
+    
+}
+
+struct DetailView: View {
+    var body: some View {
+        VStack(alignment: .center) {
+                Text("Testing Center Information").multilineTextAlignment(.center)
+                    .font(.largeTitle).padding(.bottom)
+
+                Text("For more information on testing center hours, procedures, and additional questions, please call Student Health Services at (617) 353-3575")
+                    .font(.caption)
+            Spacer()
+        }.padding().navigationBarHidden(true)
+        .navigationBarTitle(Text(""))
+        .edgesIgnoringSafeArea([.top, .bottom])
+        
     }
 }
 
+class SurveyAnswers: ObservableObject {
+    @Published var fever = false
+    @Published var cough = false
+    @Published var breathing = false
+    @Published var throat = false
+    @Published var smell = false
+    @Published var vomit = false
+    @Published var fatigue = false
+    @Published var aches = false
+}
+
+
 struct CheckView: View {
     @State var isChecked:Bool = false
-    var title:String = "Severe Cough"
+    var symptom: String
+    var symptomNumber: Int
+    
+    @EnvironmentObject var Survey: SurveyAnswers;
+    
     func toggle() {
         isChecked = !isChecked
+        
+        
+//        switch symptomNumber {
+//        case 1:
+//            Survey.fever = isChecked
+//        case 2:
+//            Survey.cough = isChecked
+//        case 3:
+//            Survey.breathing = isChecked
+//        case 4:
+//            Survey.throat = isChecked
+//        case 5:
+//            Survey.smell = isChecked
+//        case 6:
+//            Survey.vomit = isChecked
+//        case 7:
+//            Survey.fatigue = isChecked
+//        case 8:
+//            Survey.aches = isChecked
+//
+//        default:
+//            print("Survey Answers")
+//        }
     }
     
-    
-    
+
     var body: some View {
-        Button(action: toggle) {
-            HStack {
-                Image(systemName: isChecked ? "checkmark.square": "square")
-                Text(title)
+        VStack (alignment: .leading) {
+            Button(action: toggle) {
+                HStack() {
+                    Image(systemName: isChecked ? "checkmark.square": "square").resizable()
+                    .frame(width: 35, height: 35)
+                    Text(symptom).font(.headline).foregroundColor(.black)
+                    Spacer()
+                }.padding(.horizontal)
             }
         }
+        
     }
     
 }
@@ -195,8 +436,50 @@ class LoginViewController: UIViewController{
     }
     @objc func buttonAction(sender: UIButton!){
         GIDSignIn.sharedInstance()?.presentingViewController = self
-        GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+//        GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
         GIDSignIn.sharedInstance()?.signIn()
+
+        
+        
+        //Checks if user is already in database. If not add them
+        let db = Firestore.firestore()
+        let userRef = db.collection("users")
+//        var ref: DocumentReference? = nil
+        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        docRef.getDocument { (document, error) in
+            if let document = document {
+                 
+                if document.exists {
+//                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+                    print("Document data: \(document.data())")
+
+                } else {
+//                    GIDSignIn.sharedInstance()?.signIn()
+                    print("Document does not exist")
+                    
+                    userRef.document(Auth.auth().currentUser!.uid).setData([
+                        "profileName": Auth.auth().currentUser?.displayName as Any,
+                        "recentSurvey": false,
+                        "badge": "Red",
+                        "fever": false,
+                        "cough": false,
+                        "breathing": false,
+                        "throat": false,
+                        "smell": false,
+                        "vomit": false,
+                        "fatigue": false,
+                        "aches": false
+
+                    ])
+                }
+            }
+        }
+        //ref = db.collection("users").addDocument(data: [
+          //  "userid": Auth.auth().currentUser?.uid as Any,
+          //  "recentSurvey": false,
+          //  "badge": "Green"
+        // ])
         
     }
 }
