@@ -16,6 +16,8 @@ import GoogleSignIn
 struct ContentView: View {
     @State var authenticationDidFail: Bool = false
     
+    
+    
     var body: some View {
             
             ZStack {
@@ -42,21 +44,21 @@ struct ContentView: View {
 struct LoginScreen: View{
     var body: some View{
         NavigationView{
-//            if Auth.auth().currentUser?.uid == nil
-//            { //TODO: Change to != After User is added to DB
-//                NavigationLink(destination: HomeView()){
-//                    Text("Login")
-//
-//                }.navigationBarTitle("")
-//                .navigationBarHidden(true)
-//            }
-//            else
-//            {
+            if Auth.auth().currentUser?.uid == nil
+            { //TODO: Change to != After User is added to DB
+                NavigationLink(destination: HomeView()){
+                    Text("Login")
+
+                }.navigationBarTitle("")
+            .navigationBarHidden(true)
+            }
+            else
+            {
                 NavigationLink(destination: GoogleScreen()){
                     Text("Login")
                 }.navigationBarTitle("")
                 .navigationBarHidden(true)
-//            }
+            }
         }
     }
 }
@@ -142,43 +144,53 @@ struct HomeView: View {
 }
 
 
-class SurveyAnswers: ObservableObject {
-    @Published var fever = false
-    @Published var cough = false
-    @Published var breathing = false
-    @Published var throat = false
-    @Published var smell = false
-    @Published var vomit = false
-    @Published var fatigue = false
-    @Published var aches = false
-}
 
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
+    
+    @EnvironmentObject var Survey: SurveyAnswers;
     
     var body: some View {
         VStack {
             
             Text("Daily Symptom Survey").font(.largeTitle).bold().padding()
             
-            CheckView(symptom: "Fever of 100ºF or feeling unusually hot")
+            CheckView(symptom: "Fever of 100ºF or feeling unusually hot", symptomNumber: 1)
             
-            CheckView(symptom: "New or worsening cough")
+            CheckView(symptom: "New or worsening cough", symptomNumber: 2)
             
-            CheckView(symptom: "Difficulty breathing")
+            CheckView(symptom: "Difficulty breathing", symptomNumber: 3)
             
-            CheckView(symptom: "Sore throat")
+            CheckView(symptom: "Sore throat", symptomNumber: 4)
             
-            CheckView(symptom: "Loss of smell, taste, or appetite")
+            CheckView(symptom: "Loss of smell, taste, or appetite", symptomNumber: 5)
             
-            CheckView(symptom: "Vomiting")
+            CheckView(symptom: "Vomiting", symptomNumber: 6)
             
-            CheckView(symptom: "Severe Fatigue")
+            CheckView(symptom: "Severe Fatigue", symptomNumber: 7)
             
-            CheckView(symptom: "Severe Body Aches")
+            CheckView(symptom: "Severe Body Aches", symptomNumber: 8)
             
+
+
             Button(action: {
                 self.SymptomModal.toggle()
+                let db = Firestore.firestore()
+                let userRef = db.collection("users")
+                userRef.document(Auth.auth().currentUser!.uid).setData([
+                    "profileName": Auth.auth().currentUser?.displayName as Any,
+                    "recentSurvey": false,
+                    "badge": "Red",
+                    "fever": self.Survey.fever,
+                    "cough": self.Survey.cough,
+                    "breathing": self.Survey.breathing,
+                    "throat": self.Survey.throat,
+                    "smell": self.Survey.smell,
+                    "vomit": self.Survey.vomit,
+                    "fatigue": self.Survey.fatigue,
+                    "aches": self.Survey.aches
+
+                ])
             }) {
                 Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
@@ -329,14 +341,53 @@ struct DetailView: View {
     }
 }
 
+class SurveyAnswers: ObservableObject {
+    @Published var fever = false
+    @Published var cough = false
+    @Published var breathing = false
+    @Published var throat = false
+    @Published var smell = false
+    @Published var vomit = false
+    @Published var fatigue = false
+    @Published var aches = false
+}
+
+
 struct CheckView: View {
     @State var isChecked:Bool = false
     var symptom: String
+    var symptomNumber: Int
+    
+    @EnvironmentObject var Survey: SurveyAnswers;
     
     func toggle() {
         isChecked = !isChecked
+        
+        
+//        switch symptomNumber {
+//        case 1:
+//            Survey.fever = isChecked
+//        case 2:
+//            Survey.cough = isChecked
+//        case 3:
+//            Survey.breathing = isChecked
+//        case 4:
+//            Survey.throat = isChecked
+//        case 5:
+//            Survey.smell = isChecked
+//        case 6:
+//            Survey.vomit = isChecked
+//        case 7:
+//            Survey.fatigue = isChecked
+//        case 8:
+//            Survey.aches = isChecked
+//
+//        default:
+//            print("Survey Answers")
+//        }
     }
     
+
     var body: some View {
         VStack (alignment: .leading) {
             Button(action: toggle) {
@@ -410,7 +461,16 @@ class LoginViewController: UIViewController{
                     userRef.document(Auth.auth().currentUser!.uid).setData([
                         "profileName": Auth.auth().currentUser?.displayName as Any,
                         "recentSurvey": false,
-                        "badge": "Red"
+                        "badge": "Red",
+                        "fever": false,
+                        "cough": false,
+                        "breathing": false,
+                        "throat": false,
+                        "smell": false,
+                        "vomit": false,
+                        "fatigue": false,
+                        "aches": false
+
                     ])
                 }
             }
