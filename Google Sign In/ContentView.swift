@@ -1,56 +1,30 @@
-//
-//  ContentView.swift
+////
+//  AppDelegate.swift
 //  Google Sign In
 //
 //  Created by S Lasher on 9/9/20.
 //  Copyright © 2020 S Lasher. All rights reserved.
 //
 
+
 import SwiftUI
 import MapKit
 
 import Firebase
 import GoogleSignIn
+import FirebaseFirestore
 
 
 struct ContentView: View {
-    @State var authenticationDidFail: Bool = false
-    
-    
-    
+  @State private var authenticationDidPass: Bool = false
     var body: some View {
-            
-            ZStack {
-                
-                Color(white: 50)
-                    .edgesIgnoringSafeArea(.all)
-                VStack{
-                    Image("covid-icon").resizable()
-                        .frame(width: 300.0, height: 300.0).clipShape(Circle()).overlay(
-                            Circle().stroke(Color.gray, lineWidth: 4))
-                        .shadow(radius: 10).padding(.bottom, 50).offset(y:30)
-                    
-                    VStack(alignment: .leading) {
-                        Text("COVID-19 Symptom Check").bold().font(.title)
-                        Text("By Terriers, for Terriers").bold()
-                    }
-                }
-                LoginScreen()
-            }
-        
-    }
-}
-
-struct LoginScreen: View{
-    var body: some View{
         NavigationView{
-            if Auth.auth().currentUser?.uid == nil
-            { //TODO: Change to != After User is added to DB
+            if Auth.auth().currentUser?.uid != nil{
                 NavigationLink(destination: HomeView()){
-                    Text("Login")
+                        Text("Login")
 
-                }.navigationBarTitle("")
-            .navigationBarHidden(true)
+                    }.navigationBarTitle("")
+                .navigationBarHidden(true)
             }
             else
             {
@@ -61,15 +35,25 @@ struct LoginScreen: View{
             }
         }
     }
-}
+    }
 
 struct GoogleScreen: View{
     var body:some View{
-        VStack{
+        NavigationView{
+        ZStack{
+            Text("If After Signing In Nothing Occurs, Please Close the App and Try Again")
             WrappedViewController()
+            
+            if Auth.auth().currentUser?.uid != nil{
+                NavigationLink(destination: HomeView()){
+                    Text("Login Sucessful! Proceed to Home...")
+                }
+            }
+            }
         }
     }
 }
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
@@ -92,6 +76,7 @@ struct WrappedViewController: UIViewControllerRepresentable{
         print("distmantleUIViewController \(uiViewController)")
     }
 }
+
 struct HomeView: View {
     @State var SymptomModal: Bool = false
     @State var TestingModal: Bool = false
@@ -99,6 +84,7 @@ struct HomeView: View {
     var body: some View {
         
         VStack(alignment: .leading) {
+            Text("").onAppear(){self.DB_Push()}
             VStack(alignment: .center) {
                 HStack {
                     Spacer()
@@ -141,6 +127,44 @@ struct HomeView: View {
         Spacer()
         }
     }
+    
+    func DB_Push(){
+        //Checks if user is already in database. If not add them
+        let db = Firestore.firestore()
+        let userRef = db.collection("users")
+        //        var ref: DocumentReference? = nil
+        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        docRef.getDocument { (document, error) in
+            if let document = document {
+                
+                if document.exists {
+                    //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+                    print("Document data: \(document.data())")
+                    
+                } else {
+                    //                    GIDSignIn.sharedInstance()?.signIn()
+                    print("Document does not exist")
+                    
+                    userRef.document(Auth.auth().currentUser!.uid).setData([
+                        "profileName": Auth.auth().currentUser?.displayName as Any,
+                        "recentSurvey": false,
+                        "badge": "Red",
+                        "fever": false,
+                        "cough": false,
+                        "breathing": false,
+                        "throat": false,
+                        "smell": false,
+                        "vomit": false,
+                        "fatigue": false,
+                        "aches": false
+                        
+                    ])
+                }
+            }
+        }
+    }
+    
 }
 
 
@@ -415,7 +439,7 @@ class LoginViewController: UIViewController{
         let button = UIButton(frame: CGRect(x: (screenWidth/2.0) - (width/2.2),
                                             y: (screenHeight) - (height/0.20),
                                             width: width,
-                                            height: height))
+            height: height))
         
         let googleIcon = UIImage(named:"icons8-google-24")!
         button.leftImage(image: googleIcon, renderMode: .alwaysOriginal)
@@ -438,43 +462,8 @@ class LoginViewController: UIViewController{
         GIDSignIn.sharedInstance()?.presentingViewController = self
 //        GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
         GIDSignIn.sharedInstance()?.signIn()
-
         
-        
-        //Checks if user is already in database. If not add them
-        let db = Firestore.firestore()
-        let userRef = db.collection("users")
-//        var ref: DocumentReference? = nil
-        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
-        
-        docRef.getDocument { (document, error) in
-            if let document = document {
-                 
-                if document.exists {
-//                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
-                    print("Document data: \(document.data())")
 
-                } else {
-//                    GIDSignIn.sharedInstance()?.signIn()
-                    print("Document does not exist")
-                    
-                    userRef.document(Auth.auth().currentUser!.uid).setData([
-                        "profileName": Auth.auth().currentUser?.displayName as Any,
-                        "recentSurvey": false,
-                        "badge": "Red",
-                        "fever": false,
-                        "cough": false,
-                        "breathing": false,
-                        "throat": false,
-                        "smell": false,
-                        "vomit": false,
-                        "fatigue": false,
-                        "aches": false
-
-                    ])
-                }
-            }
-        }
         //ref = db.collection("users").addDocument(data: [
           //  "userid": Auth.auth().currentUser?.uid as Any,
           //  "recentSurvey": false,
