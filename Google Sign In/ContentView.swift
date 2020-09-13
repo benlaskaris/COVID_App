@@ -11,14 +11,7 @@ import MapKit
 
 import Firebase
 import GoogleSignIn
-import FirebaseFirestore
 
-import SwiftUI
-import MapKit
-
-import Firebase
-import GoogleSignIn
-import FirebaseFirestore
 
 struct ContentView: View {
     @State var authenticationDidFail: Bool = false
@@ -49,19 +42,21 @@ struct ContentView: View {
 struct LoginScreen: View{
     var body: some View{
         NavigationView{
-            if Auth.auth().currentUser?.uid == nil{ //TODO: Change to != After User is added to DB
-                NavigationLink(destination: HomeView()){
-                    Text("Login")
-                    
-                }.navigationBarTitle("")
-                .navigationBarHidden(true)
-            }
-            else{
+//            if Auth.auth().currentUser?.uid == nil
+//            { //TODO: Change to != After User is added to DB
+//                NavigationLink(destination: HomeView()){
+//                    Text("Login")
+//
+//                }.navigationBarTitle("")
+//                .navigationBarHidden(true)
+//            }
+//            else
+//            {
                 NavigationLink(destination: GoogleScreen()){
                     Text("Login")
                 }.navigationBarTitle("")
                 .navigationBarHidden(true)
-            }
+//            }
         }
     }
 }
@@ -146,6 +141,18 @@ struct HomeView: View {
     }
 }
 
+
+class SurveyAnswers: ObservableObject {
+    @Published var fever = false
+    @Published var cough = false
+    @Published var breathing = false
+    @Published var throat = false
+    @Published var smell = false
+    @Published var vomit = false
+    @Published var fatigue = false
+    @Published var aches = false
+}
+
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
     
@@ -162,7 +169,7 @@ struct SymptomView: View {
             
             CheckView(symptom: "Sore throat")
             
-            CheckView(symptom: "Loss of smell taste, or appetite")
+            CheckView(symptom: "Loss of smell, taste, or appetite")
             
             CheckView(symptom: "Vomiting")
             
@@ -378,34 +385,33 @@ class LoginViewController: UIViewController{
     }
     @objc func buttonAction(sender: UIButton!){
         GIDSignIn.sharedInstance()?.presentingViewController = self
-        GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+//        GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
         GIDSignIn.sharedInstance()?.signIn()
+
+        
         
         //Checks if user is already in database. If not add them
         let db = Firestore.firestore()
         let userRef = db.collection("users")
-        var ref: DocumentReference? = nil
+//        var ref: DocumentReference? = nil
         let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
         
         docRef.getDocument { (document, error) in
             if let document = document {
-
-
-                if document.exists{
+                 
+                if document.exists {
+//                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
                     print("Document data: \(document.data())")
 
                 } else {
-
-                print("Document does not exist")
-
+//                    GIDSignIn.sharedInstance()?.signIn()
+                    print("Document does not exist")
                     
                     userRef.document(Auth.auth().currentUser!.uid).setData([
                         "profileName": Auth.auth().currentUser?.displayName as Any,
                         "recentSurvey": false,
                         "badge": "Red"
                     ])
-
-
                 }
             }
         }
