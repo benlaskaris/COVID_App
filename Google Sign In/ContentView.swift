@@ -12,12 +12,23 @@ import MapKit
 import Firebase
 import GoogleSignIn
 
+class SurveyAnswers: ObservableObject {
+       @Published var fever: Bool = false
+       @Published var cough: Bool = false
+       @Published var breathing: Bool = false
+       @Published var throat: Bool = false
+       @Published var smell: Bool = false
+       @Published var vomit: Bool = false
+       @Published var fatigue: Bool = false
+       @Published var aches: Bool = false
+}
+
 
 struct ContentView: View {
     @State var authenticationDidFail: Bool = false
-    
-    
-    
+//    @EnvironmentObject var Survey: SurveyAnswers;
+
+   
     var body: some View {
             
             ZStack {
@@ -44,7 +55,7 @@ struct ContentView: View {
 struct LoginScreen: View{
     var body: some View{
         NavigationView{
-            if Auth.auth().currentUser?.uid == nil
+            if Auth.auth().currentUser?.uid != nil
             { //TODO: Change to != After User is added to DB
                 NavigationLink(destination: HomeView()){
                     Text("Login")
@@ -95,6 +106,8 @@ struct WrappedViewController: UIViewControllerRepresentable{
 struct HomeView: View {
     @State var SymptomModal: Bool = false
     @State var TestingModal: Bool = false
+    
+
     
     var body: some View {
         
@@ -148,7 +161,7 @@ struct HomeView: View {
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
     
-    @EnvironmentObject var Survey: SurveyAnswers;
+    @ObservedObject var Survey = SurveyAnswers();
     
     var body: some View {
         VStack {
@@ -175,9 +188,12 @@ struct SymptomView: View {
 
             Button(action: {
                 self.SymptomModal.toggle()
+                
+                
                 let db = Firestore.firestore()
-                let userRef = db.collection("users")
-                userRef.document(Auth.auth().currentUser!.uid).setData([
+                let userRef:CollectionReference? = db.collection("users")
+
+                userRef?.document(Auth.auth().currentUser!.uid).updateData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
                     "recentSurvey": false,
                     "badge": "Red",
@@ -189,8 +205,23 @@ struct SymptomView: View {
                     "vomit": self.Survey.vomit,
                     "fatigue": self.Survey.fatigue,
                     "aches": self.Survey.aches
-
                 ])
+
+
+//                userRef.document(Auth.auth().currentUser!.uid).updateData([
+//                    "profileName": Auth.auth().currentUser?.displayName as Any,
+//                    "recentSurvey": false,
+//                    "badge": "Red",
+//                    "fever": true,
+//                    "cough": true,
+//                    "breathing": true,
+//                    "throat": true,
+//                    "smell": true,
+//                    "vomit": true,
+//                    "fatigue": true,
+//                    "aches": true
+//                ])
+
             }) {
                 Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
@@ -341,56 +372,50 @@ struct DetailView: View {
     }
 }
 
-class SurveyAnswers: ObservableObject {
-    @Published var fever = false
-    @Published var cough = false
-    @Published var breathing = false
-    @Published var throat = false
-    @Published var smell = false
-    @Published var vomit = false
-    @Published var fatigue = false
-    @Published var aches = false
-}
-
 
 struct CheckView: View {
     @State var isChecked:Bool = false
     var symptom: String
     var symptomNumber: Int
     
-    @EnvironmentObject var Survey: SurveyAnswers;
+    @ObservedObject var Survey = SurveyAnswers();
     
     func toggle() {
         isChecked = !isChecked
         
         
-//        switch symptomNumber {
-//        case 1:
-//            Survey.fever = isChecked
-//        case 2:
-//            Survey.cough = isChecked
-//        case 3:
-//            Survey.breathing = isChecked
-//        case 4:
-//            Survey.throat = isChecked
-//        case 5:
-//            Survey.smell = isChecked
-//        case 6:
-//            Survey.vomit = isChecked
-//        case 7:
-//            Survey.fatigue = isChecked
-//        case 8:
-//            Survey.aches = isChecked
-//
-//        default:
-//            print("Survey Answers")
-//        }
+        switch self.symptomNumber {
+       case 1:
+        Survey.fever = self.isChecked
+       case 2:
+           Survey.cough = self.isChecked
+       case 3:
+           Survey.breathing = self.isChecked
+       case 4:
+           Survey.throat = self.isChecked
+       case 5:
+           Survey.smell = self.isChecked
+       case 6:
+        Survey.vomit = self.isChecked
+       case 7:
+           Survey.fatigue = self.isChecked
+       case 8:
+           Survey.aches = self.isChecked
+
+       default:
+           print("Survey Answers")
+       }
+
     }
     
 
     var body: some View {
         VStack (alignment: .leading) {
-            Button(action: toggle) {
+            Button(action: {
+                self.toggle()
+                
+               
+            }) {
                 HStack() {
                     Image(systemName: isChecked ? "checkmark.square": "square").resizable()
                     .frame(width: 35, height: 35)
