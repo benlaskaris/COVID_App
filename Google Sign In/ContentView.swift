@@ -291,6 +291,9 @@ struct HomeView: View {
                     //                    GIDSignIn.sharedInstance()?.signIn()
                     print("Document does not exist")
                     
+                    let date = Date()
+                   
+                    
                     userRef.document(Auth.auth().currentUser!.uid).setData([
                         "profileName": Auth.auth().currentUser?.displayName as Any,
                         "recentSurvey": false,
@@ -304,7 +307,7 @@ struct HomeView: View {
                         "fatigue": false,
                         "aches": false,
                         "admin": false,
-//                        "loginTime": 
+                        "loginTime": date
                         
                     ])
                 }
@@ -371,6 +374,7 @@ struct SymptomView: View {
 //                }
 //
                 
+                let date = Date()
 
                 userRef.document(Auth.auth().currentUser!.uid).setData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
@@ -384,6 +388,7 @@ struct SymptomView: View {
                     "vomit": self.survey.vomit,
                     "fatigue": self.survey.fatigue,
                     "aches": self.survey.aches,
+                    "loginTime": date
                 ])
                 
             }) {
