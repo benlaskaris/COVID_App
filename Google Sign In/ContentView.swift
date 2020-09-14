@@ -21,9 +21,36 @@ struct ContentView: View {
         NavigationView{
             if Auth.auth().currentUser?.uid != nil{
                 NavigationLink(destination: HomeView()){
-                        Text("Login")
-                    }.navigationBarTitle("")
-                .navigationBarHidden(true)
+                        VStack(alignment: .center) {
+                        //                        Spacer()
+                                                
+                                                Image("terrier-icon")
+                                                    .resizable()
+                                                    .aspectRatio(contentMode: .fit)
+                                                    .frame(width: 180, alignment: .center)
+                                                    .accessibility(hidden: true)
+                                                
+                                                TitleView()
+                                                
+                                                VStack(alignment: .leading) {
+                                                    InformationDetailView(title: "Daily Symptom Survey", subTitle: "Fill out your daily health survey quickly and easily through one app.", imageName: "heart")
+
+                                                    InformationDetailView(title: "Testing Locations", subTitle: "Find the COVID-19 testing location nearest to you to #FlattenTheCurve.", imageName: "mappin.circle")
+
+                                                    InformationDetailView(title: "COVID-19 Statistics", subTitle: "See a detailed dashboard of all recent COVID-19-related statistics on campus ", imageName: "staroflife")
+                                                }
+                                                
+                                                Spacer(minLength: 30)
+                                                
+                                                HStack {
+                                                    Spacer()
+                                                    Text("Get Started").customButton()
+                                                    Spacer()
+                                                }
+                                           }.padding(.horizontal)
+
+                                            }.navigationBarTitle("").buttonStyle(PlainButtonStyle())
+                        //                .navigationBarHidden(true)
             }
             else
             {
