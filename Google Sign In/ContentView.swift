@@ -15,8 +15,24 @@ import GoogleSignIn
 import FirebaseFirestore
 
 
+class SurveyAnswers: ObservableObject {
+    @Published var fever: Bool = false
+    @Published var cough: Bool = false
+    @Published var breathing: Bool = false
+    @Published var throat: Bool = false
+    @Published var smell: Bool = false
+    @Published var vomit: Bool = false
+    @Published var fatigue: Bool = false
+    @Published var aches: Bool = false
+}
+
+
+
 struct ContentView: View {
   @State private var authenticationDidPass: Bool = false
+    
+//    @ObservedObject var survey = SurveyAnswers()
+    
     var body: some View {
         NavigationView{
             if Auth.auth().currentUser?.uid != nil{
@@ -175,6 +191,8 @@ struct HomeView: View {
     @State var TestingModal: Bool = false
     @State var AdminModal: Bool = false
     
+//    @ObservedObject var survey: SurveyAnswers
+    
     var body: some View {
         
         VStack(alignment: .leading) {
@@ -276,28 +294,28 @@ struct HomeView: View {
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
     
-    @EnvironmentObject var Survey: SurveyAnswers;
+    @ObservedObject var survey = SurveyAnswers();
     
     var body: some View {
         VStack {
             
             Text("Daily Symptom Survey").font(.largeTitle).bold().padding()
             
-            CheckView(symptom: "Fever of 100ºF or feeling unusually hot", symptomNumber: 1)
+            CheckView(symptom: "Fever of 100ºF or feeling unusually hot", symptomNumber: 1, survey: self.survey)
             
-            CheckView(symptom: "New or worsening cough", symptomNumber: 2)
+            CheckView(symptom: "New or worsening cough", symptomNumber: 2, survey: self.survey)
             
-            CheckView(symptom: "Difficulty breathing", symptomNumber: 3)
+            CheckView(symptom: "Difficulty breathing", symptomNumber: 3, survey: self.survey)
             
-            CheckView(symptom: "Sore throat", symptomNumber: 4)
+            CheckView(symptom: "Sore throat", symptomNumber: 4, survey: self.survey)
             
-            CheckView(symptom: "Loss of smell, taste, or appetite", symptomNumber: 5)
+            CheckView(symptom: "Loss of smell, taste, or appetite", symptomNumber: 5, survey: self.survey)
             
-            CheckView(symptom: "Vomiting", symptomNumber: 6)
+            CheckView(symptom: "Vomiting", symptomNumber: 6, survey: self.survey)
             
-            CheckView(symptom: "Severe Fatigue", symptomNumber: 7)
+            CheckView(symptom: "Severe Fatigue", symptomNumber: 7, survey: self.survey)
             
-            CheckView(symptom: "Severe Body Aches", symptomNumber: 8)
+            CheckView(symptom: "Severe Body Aches", symptomNumber: 8, survey: self.survey)
             
 
 
@@ -305,21 +323,23 @@ struct SymptomView: View {
                 self.SymptomModal.toggle()
                 let db = Firestore.firestore()
                 let userRef = db.collection("users")
+                
+
                 userRef.document(Auth.auth().currentUser!.uid).setData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
                     "recentSurvey": false,
                     "badge": "Red",
-                    "fever": self.Survey.fever,
-                    "cough": self.Survey.cough,
-                    "breathing": self.Survey.breathing,
-                    "throat": self.Survey.throat,
-                    "smell": self.Survey.smell,
-                    "vomit": self.Survey.vomit,
-                    "fatigue": self.Survey.fatigue,
-                    "aches": self.Survey.aches,
-                    "admin": false
-
+                    "fever": self.survey.fever,
+                    "cough": self.survey.cough,
+                    "breathing": self.survey.breathing,
+                    "throat": self.survey.throat,
+                    "smell": self.survey.smell,
+                    "vomit": self.survey.vomit,
+                    "fatigue": self.survey.fatigue,
+                    "aches": self.survey.aches,
+//                    "admin": false // this should change - dummy value for now BL 09/14/2020
                 ])
+                
             }) {
                 Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
@@ -497,16 +517,6 @@ struct DetailView: View {
     }
 }
 
-class SurveyAnswers: ObservableObject {
-    @Published var fever = false
-    @Published var cough = false
-    @Published var breathing = false
-    @Published var throat = false
-    @Published var smell = false
-    @Published var vomit = false
-    @Published var fatigue = false
-    @Published var aches = false
-}
 
 
 struct CheckView: View {
@@ -514,33 +524,33 @@ struct CheckView: View {
     var symptom: String
     var symptomNumber: Int
     
-    @EnvironmentObject var Survey: SurveyAnswers;
+    @ObservedObject var survey: SurveyAnswers;
     
     func toggle() {
         isChecked = !isChecked
         
         
-//        switch symptomNumber {
-//        case 1:
-//            Survey.fever = isChecked
-//        case 2:
-//            Survey.cough = isChecked
-//        case 3:
-//            Survey.breathing = isChecked
-//        case 4:
-//            Survey.throat = isChecked
-//        case 5:
-//            Survey.smell = isChecked
-//        case 6:
-//            Survey.vomit = isChecked
-//        case 7:
-//            Survey.fatigue = isChecked
-//        case 8:
-//            Survey.aches = isChecked
-//
-//        default:
-//            print("Survey Answers")
-//        }
+        switch symptomNumber {
+        case 1:
+            self.survey.fever = isChecked
+        case 2:
+            self.survey.cough = isChecked
+        case 3:
+            self.survey.breathing = isChecked
+        case 4:
+            self.survey.throat = isChecked
+        case 5:
+            self.survey.smell = isChecked
+        case 6:
+            self.survey.vomit = isChecked
+        case 7:
+            self.survey.fatigue = isChecked
+        case 8:
+            self.survey.aches = isChecked
+
+        default:
+            print("Survey Answers")
+        }
     }
     
 
