@@ -2,9 +2,9 @@
 Boston University EC 463 - Senior Design I
 
 # Team Composition
-Norman A. Toro Vega - Front-End Development 🎨
-Se'lina Lasher - Backend Development 💻
-Benjamin Laskeris - Backend Development 💻
+Norman A. Toro Vega - Front-End Development 🎨 <br/>
+Se'Lina Lasher - Backend Development 💻<br/>
+Benjamin Laskeris - Backend Development 💻<br/>
 
 # Software Stack
 Developed with Swift, SwiftUI, and Google Firebase
@@ -13,5 +13,5 @@ Developed with Swift, SwiftUI, and Google Firebase
 This app was developed for providing BU Terriers the ability to submit their daily symptom survey, find testing locations, and see recent statistics on BU's COVID-19 Campus Plan
 
 # References
-Splash Screen:
+Splash Screen: <br/>
 https://medium.com/better-programming/creating-an-apple-like-splash-screen-in-swiftui-fdeb36b47e81
