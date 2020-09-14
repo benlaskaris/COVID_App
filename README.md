@@ -10,3 +10,8 @@ Benjamin Laskeris - Backend Development 💻
 Developed with Swift, SwiftUI, and Google Firebase
 
 # About the Project
+This app was developed for providing BU Terriers the ability to submit their daily symptom survey, find testing locations, and see recent statistics on BU's COVID-19 Campus Plan
+
+# References
+Splash Screen:
+https://medium.com/better-programming/creating-an-apple-like-splash-screen-in-swiftui-fdeb36b47e81

@@ -1,75 +1,152 @@
-//
-//  ContentView.swift
+////
+//  AppDelegate.swift
 //  Google Sign In
 //
-//  Created by S Lasher on 9/9/20.
+//  Created by S Lasher && Norman A. Toro Vega on 9/9/20.
 //  Copyright © 2020 S Lasher. All rights reserved.
 //
+
 
 import SwiftUI
 import MapKit
 
 import Firebase
 import GoogleSignIn
+import FirebaseFirestore
 
 
 struct ContentView: View {
-    @State var authenticationDidFail: Bool = false
-    
-    
-    
+  @State private var authenticationDidPass: Bool = false
     var body: some View {
-            
-            ZStack {
-                
-                Color(white: 50)
-                    .edgesIgnoringSafeArea(.all)
-                VStack{
-                    Image("covid-icon").resizable()
-                        .frame(width: 300.0, height: 300.0).clipShape(Circle()).overlay(
-                            Circle().stroke(Color.gray, lineWidth: 4))
-                        .shadow(radius: 10).padding(.bottom, 50).offset(y:30)
-                    
-                    VStack(alignment: .leading) {
-                        Text("COVID-19 Symptom Check").bold().font(.title)
-                        Text("By Terriers, for Terriers").bold()
-                    }
-                }
-                LoginScreen()
-            }
-        
-    }
-}
-
-struct LoginScreen: View{
-    var body: some View{
         NavigationView{
-            if Auth.auth().currentUser?.uid == nil
-            { //TODO: Change to != After User is added to DB
+            if Auth.auth().currentUser?.uid != nil{
                 NavigationLink(destination: HomeView()){
-                    Text("Login")
-
-                }.navigationBarTitle("")
-            .navigationBarHidden(true)
+                        Text("Login")
+                    }.navigationBarTitle("")
+                .navigationBarHidden(true)
             }
             else
             {
                 NavigationLink(destination: GoogleScreen()){
-                    Text("Login")
-                }.navigationBarTitle("")
-                .navigationBarHidden(true)
+                    VStack(alignment: .center) {
+//                        Spacer()
+                        
+                        Image("terrier-icon")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 180, alignment: .center)
+                            .accessibility(hidden: true)
+                        
+                        TitleView()
+                        
+                        VStack(alignment: .leading) {
+                            InformationDetailView(title: "Daily Symptom Survey", subTitle: "Fill out your daily health survey quickly and easily through one app.", imageName: "heart")
+
+                            InformationDetailView(title: "Testing Locations", subTitle: "Find the COVID-19 testing location nearest to you to #FlattenTheCurve.", imageName: "mappin.circle")
+
+                            InformationDetailView(title: "COVID-19 Statistics", subTitle: "See a detailed dashboard of all recent COVID-19-related statistics on campus ", imageName: "staroflife")
+                        }
+                        
+                        Spacer(minLength: 30)
+                        
+                        HStack {
+                            Spacer()
+                            Text("Login").customButton()
+                            Spacer()
+                        }
+                   }.padding(.horizontal)
+
+                    }.navigationBarTitle("").buttonStyle(PlainButtonStyle())
+//                .navigationBarHidden(true)
             }
         }
     }
 }
 
-struct GoogleScreen: View{
-    var body:some View{
-        VStack{
-            WrappedViewController()
+struct InformationDetailView: View {
+    var title: String = "title"
+    var subTitle: String = "subTitle"
+    var imageName: String = "car"
+
+    var body: some View {
+        HStack(alignment: .center) {
+            Image(systemName: imageName)
+                .font(.largeTitle)
+                .foregroundColor(.black)
+                .padding()
+                .accessibility(hidden: true)
+
+            VStack(alignment: .leading) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                    .accessibility(addTraits: .isHeader)
+
+                Text(subTitle)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.top)
+    }
+}
+
+struct TitleView: View {
+    var body: some View {
+        VStack {
+
+            Text("Welcome to").fontWeight(.black)
+                .font(.system(size: 36)).foregroundColor(.black)
+
+            Text("TerrierCheck")
+                .fontWeight(.black)
+                .font(.system(size: 36))
+                .foregroundColor(.red)
         }
     }
 }
+
+struct ButtonModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .foregroundColor(.white)
+            .font(.headline)
+            .padding()
+            .frame(minWidth: 0, maxWidth: .infinity, alignment: .center)
+            .background(RoundedRectangle(cornerRadius: 15, style: .continuous)
+                .fill(Color.mainColor))
+            .padding(.bottom)
+    }
+}
+
+extension View {
+    func customButton() -> ModifiedContent<Self, ButtonModifier> {
+        return modifier(ButtonModifier())
+    }
+}
+
+extension Color {
+    static var mainColor = Color(UIColor.systemRed)
+}
+
+struct GoogleScreen: View{
+    var body:some View{
+        NavigationView{
+        ZStack{
+            Text("If After Signing In Nothing Occurs, Please Close the App and Try Again")
+            WrappedViewController()
+            
+            if Auth.auth().currentUser?.uid != nil{
+                NavigationLink(destination: HomeView()){
+                    Text("Login Sucessful! Proceed to Home...")
+                }
+            }
+            }
+        }
+    }
+}
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
@@ -92,13 +169,16 @@ struct WrappedViewController: UIViewControllerRepresentable{
         print("distmantleUIViewController \(uiViewController)")
     }
 }
+
 struct HomeView: View {
     @State var SymptomModal: Bool = false
     @State var TestingModal: Bool = false
+    @State var AdminModal: Bool = false
     
     var body: some View {
         
         VStack(alignment: .leading) {
+            Text("").onAppear(){self.DB_Push()}
             VStack(alignment: .center) {
                 HStack {
                     Spacer()
@@ -137,10 +217,58 @@ struct HomeView: View {
                 }.sheet(isPresented: self.$TestingModal) {
                     TestingView()
                 }
+                
+                Button(action: {
+                    self.AdminModal = true
+                }) {
+                    Text("See Historical Data").font(.title)
+                }.sheet(isPresented: self.$AdminModal) {
+                    AdminView()
+                }
+                
             }
         Spacer()
         }
     }
+    
+    func DB_Push(){
+        //Checks if user is already in database. If not add them
+        let db = Firestore.firestore()
+        let userRef = db.collection("users")
+        //        var ref: DocumentReference? = nil
+        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+        
+        docRef.getDocument { (document, error) in
+            if let document = document {
+                
+                if document.exists {
+                    //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+                    print("Document data: \(document.data())")
+                    
+                } else {
+                    //                    GIDSignIn.sharedInstance()?.signIn()
+                    print("Document does not exist")
+                    
+                    userRef.document(Auth.auth().currentUser!.uid).setData([
+                        "profileName": Auth.auth().currentUser?.displayName as Any,
+                        "recentSurvey": false,
+                        "badge": "Red",
+                        "fever": false,
+                        "cough": false,
+                        "breathing": false,
+                        "throat": false,
+                        "smell": false,
+                        "vomit": false,
+                        "fatigue": false,
+                        "aches": false,
+                        "admin": false
+                        
+                    ])
+                }
+            }
+        }
+    }
+    
 }
 
 
@@ -188,7 +316,8 @@ struct SymptomView: View {
                     "smell": self.Survey.smell,
                     "vomit": self.Survey.vomit,
                     "fatigue": self.Survey.fatigue,
-                    "aches": self.Survey.aches
+                    "aches": self.Survey.aches,
+                    "admin": false
 
                 ])
             }) {
@@ -273,6 +402,33 @@ struct TestingView: View {
                         }.navigationBarTitle("")
                         .navigationBarHidden(true)
                     }
+            }
+        }
+    }
+}
+
+struct AdminView: View {
+    @State var Admin: Bool = false
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("").onAppear(){self.readDB()}
+            if self.Admin == true{
+            Text("Welcome to the Admin Dashboard")
+            }
+            else{
+                Text("You Do Not Have the Permission to View the Admin Dashboard")
+            }
+        }
+    }
+    func readDB(){
+        let db = Firestore.firestore()
+        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+        docRef.getDocument(source: .cache) { (document, error) in
+            if let document = document {
+                self.Admin = document.get("admin") as! Bool
+            } else {
+                print("Document does not exist in cache")
             }
         }
     }
@@ -415,7 +571,7 @@ class LoginViewController: UIViewController{
         let button = UIButton(frame: CGRect(x: (screenWidth/2.0) - (width/2.2),
                                             y: (screenHeight) - (height/0.20),
                                             width: width,
-                                            height: height))
+            height: height))
         
         let googleIcon = UIImage(named:"icons8-google-24")!
         button.leftImage(image: googleIcon, renderMode: .alwaysOriginal)
@@ -438,43 +594,8 @@ class LoginViewController: UIViewController{
         GIDSignIn.sharedInstance()?.presentingViewController = self
 //        GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
         GIDSignIn.sharedInstance()?.signIn()
-
         
-        
-        //Checks if user is already in database. If not add them
-        let db = Firestore.firestore()
-        let userRef = db.collection("users")
-//        var ref: DocumentReference? = nil
-        let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
-        
-        docRef.getDocument { (document, error) in
-            if let document = document {
-                 
-                if document.exists {
-//                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
-                    print("Document data: \(document.data())")
 
-                } else {
-//                    GIDSignIn.sharedInstance()?.signIn()
-                    print("Document does not exist")
-                    
-                    userRef.document(Auth.auth().currentUser!.uid).setData([
-                        "profileName": Auth.auth().currentUser?.displayName as Any,
-                        "recentSurvey": false,
-                        "badge": "Red",
-                        "fever": false,
-                        "cough": false,
-                        "breathing": false,
-                        "throat": false,
-                        "smell": false,
-                        "vomit": false,
-                        "fatigue": false,
-                        "aches": false
-
-                    ])
-                }
-            }
-        }
         //ref = db.collection("users").addDocument(data: [
           //  "userid": Auth.auth().currentUser?.uid as Any,
           //  "recentSurvey": false,
