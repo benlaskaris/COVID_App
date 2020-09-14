@@ -7,6 +7,8 @@
 //
 
 
+
+
 import SwiftUI
 import MapKit
 
@@ -150,7 +152,7 @@ struct HomeView: View {
                 
                 if document.exists {
                     //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
-                    print("Document data: \(document.data())")
+                    print("Document data: \(String(describing: document.data()))")
                     
                 } else {
                     //                    GIDSignIn.sharedInstance()?.signIn()
@@ -167,7 +169,8 @@ struct HomeView: View {
                         "smell": false,
                         "vomit": false,
                         "fatigue": false,
-                        "aches": false
+                        "aches": false,
+                        "admin": false
                         
                     ])
                 }
@@ -318,8 +321,8 @@ struct AdminView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            Text("").onAppear(){self.readDB()}
-            if self.Admin == true{
+            Text("")
+            if self.readDB(){
             Text("Welcome to the Admin Dashboard")
             }
             else{
@@ -327,7 +330,7 @@ struct AdminView: View {
             }
         }
     }
-    func readDB(){
+    func readDB()->Bool{
         let db = Firestore.firestore()
         let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
         docRef.getDocument(source: .cache) { (document, error) in
@@ -337,6 +340,7 @@ struct AdminView: View {
                 print("Document does not exist in cache")
             }
         }
+        return self.Admin
     }
 }
 
