@@ -568,8 +568,8 @@ class LoginViewController: UIViewController{
         let height : CGFloat = 40.0
         let width : CGFloat = 260.0
         
-        let button = UIButton(frame: CGRect(x: (screenWidth/2.0) - (width/2.2),
-                                            y: (screenHeight) - (height/0.20),
+        let button = UIButton(frame: CGRect(x: 100,
+                                            y: 100,
                                             width: width,
             height: height))
         
