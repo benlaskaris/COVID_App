@@ -29,10 +29,8 @@ class SurveyAnswers: ObservableObject {
 
 
 struct ContentView: View {
-  @State private var authenticationDidPass: Bool = false
-    
-//    @ObservedObject var survey = SurveyAnswers()
-    
+    @State private var authenticationDidPass: Bool = false
+        
     var body: some View {
         NavigationView{
             if Auth.auth().currentUser?.uid != nil{
@@ -191,7 +189,6 @@ struct HomeView: View {
     @State var TestingModal: Bool = false
     @State var AdminModal: Bool = false
     
-//    @ObservedObject var survey: SurveyAnswers
     
     var body: some View {
         
@@ -279,7 +276,8 @@ struct HomeView: View {
                         "vomit": false,
                         "fatigue": false,
                         "aches": false,
-                        "admin": false
+                        "admin": false,
+//                        "loginTime": 
                         
                     ])
                 }
@@ -324,11 +322,33 @@ struct SymptomView: View {
                 let db = Firestore.firestore()
                 let userRef = db.collection("users")
                 
+                var test = "Green"
+                
+                // I know this is hacky and bad but I couldn't figure out how to
+                // iterate through a class (was going to iterate through the survey and check each value)
+                if (self.survey.fever) {test = "Red"}
+                if (self.survey.cough) {test = "Red"}
+                if (self.survey.breathing) {test = "Red"}
+                if (self.survey.throat) {test = "Red"}
+                if (self.survey.smell) {test = "Red"}
+                if (self.survey.vomit) {test = "Red"}
+                if (self.survey.fatigue) {test = "Red"}
+                if (self.survey.aches) {test = "Red"}
+
+//                let mirror = Mirror(reflecting: self.survey)
+//                // if they have any symptoms, give them a red badge (for now)
+//                for a in mirror.children {
+//                    if (a.value as! Bool == true) {
+//                        test = "red"
+//                    }
+//                }
+//
+                
 
                 userRef.document(Auth.auth().currentUser!.uid).setData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
-                    "recentSurvey": false,
-                    "badge": "Red",
+                    "recentSurvey": true,
+                    "badge": test,
                     "fever": self.survey.fever,
                     "cough": self.survey.cough,
                     "breathing": self.survey.breathing,
@@ -337,7 +357,6 @@ struct SymptomView: View {
                     "vomit": self.survey.vomit,
                     "fatigue": self.survey.fatigue,
                     "aches": self.survey.aches,
-//                    "admin": false // this should change - dummy value for now BL 09/14/2020
                 ])
                 
             }) {
@@ -345,6 +364,8 @@ struct SymptomView: View {
             }
         }
     }
+    
+    
 }
 
 
