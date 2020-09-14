@@ -218,6 +218,9 @@ struct HomeView: View {
     @State var TestingModal: Bool = false
     @State var AdminModal: Bool = false
     
+    var status: String = "Cleared"
+    var statusColor: Color = Color.red
+    
 //    @ObservedObject var survey: SurveyAnswers
     
     var body: some View {
@@ -228,10 +231,17 @@ struct HomeView: View {
                 HStack {
                     Spacer()
                 }
-                Image("covid-icon").resizable()
-                .frame(width: 300.0, height: 300.0).clipShape(Circle()).overlay(
-                Circle().stroke(Color.gray, lineWidth: 4))
-                .shadow(radius: 10).padding(.bottom, 50).offset(y:30)
+//                Image(systemName: "checkmark.square")
+//                .font(.largeTitle)
+//                .foregroundColor(.black)
+//                    .overlay(RoundedRectangle(cornerRadius: 25, style: .continuous)
+//                        .fill(Color.red)).frame(width: 200, height: 200)
+                
+                RoundedRectangle(cornerRadius: 25, style: .continuous).fill(statusColor)
+                    .shadow(radius: 10).frame(width: 200, height: 200)
+                
+                Text("Status:").font(.largeTitle).bold().padding(.top)
+                Text(status).font(.title).bold()
             }
             
             VStack(alignment: .center) {
@@ -249,7 +259,7 @@ struct HomeView: View {
                 Button(action: {
                     self.SymptomModal = true
                 }) {
-                    Text("Report my symptoms").font(.title)
+                    Text("Report my symptoms").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$SymptomModal) {
                     SymptomView(SymptomModal: self.$SymptomModal)
                 }
@@ -258,7 +268,7 @@ struct HomeView: View {
                 Button(action: {
                     self.TestingModal = true
                 }) {
-                    Text("Find Testing Locations").font(.title)
+                    Text("Find Testing Locations").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$TestingModal) {
                     TestingView()
                 }
@@ -266,7 +276,7 @@ struct HomeView: View {
                 Button(action: {
                     self.AdminModal = true
                 }) {
-                    Text("See Historical Data").font(.title)
+                    Text("See Historical Data").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$AdminModal) {
                     AdminView()
                 }
