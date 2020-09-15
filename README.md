@@ -11,7 +11,7 @@ Developed with Swift, SwiftUI, and Google Firebase
 
 # About the Project
 This app was developed for providing BU Terriers the ability to submit their daily symptom survey, find testing locations, and see recent statistics on BU's COVID-19 Campus Plan
-#_Backend Design_#
+__**Backend Design**__
 
 
 # References
