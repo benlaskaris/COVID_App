@@ -504,7 +504,8 @@ struct AdminView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                        Text("").onAppear() { self.readDB()
+                        Text("").onAppear() {
+                            self.readDB()
                         }
                         if self.Admin == true{
                                 
@@ -570,10 +571,19 @@ struct AdminView: View {
                             }
                         }
                     else{
-                            Text("You Do Not Have the Permission to View the Admin Dashboard").font(.headline).bold()
+                            Spacer()
+                            VStack {
+                                HStack {
+                                    Spacer()
+                                    Text("You don't have permission to see historical data. Please contact your school IT Department for support.").fontWeight(.black)
+                                    .font(.system(size: 25)).foregroundColor(.black).multilineTextAlignment(.center)
+                                    Spacer()
+                                }
+                            }.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                                .edgesIgnoringSafeArea(.all).padding(.vertical, 250)
+
                     }
-                        Spacer()
-                    }.padding(.horizontal)
+                }.padding(.horizontal)
         }
         
 }
