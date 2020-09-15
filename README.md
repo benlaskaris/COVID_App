@@ -24,7 +24,7 @@ When launching the application, whether the user is new or not, the Home Screen 
 <br/>_Use of Navigation Links to Change Views_<br/>
 Navigation Links are used throughout the app to easily transition between multiple screens. For example, to determine when launching the app, the software needs to determine which screen to show the user, either the login screen (the user is either new or signed out) or the Home Screen (bipassing the login screen because the user is already signed in). To decide which screen to show a conditoinal is used ( is the user id empty or not) and upon evaluation of that conditional a Login link is presented to the user that when clicked takes them to the appropriate screen. <br/>
 <br/> _Determining Admin Dashboard Permissions and Pulling Data from the Database_<br/>
-
+The admin dashboard is a part of the native app. To determine who can view the dashboard a conditional statement is used. Each user has a field in the database ("admin") a bool that is either true (you're an admin) or false. If false then you cannot see the admin dashboard, however, if true then a pie chart holding the data for number of each badge color assigned to readers is displayed. As well, as the total number of late surveys and on time surveys. <br/>
 
 # References
 Splash Screen: <br/>
