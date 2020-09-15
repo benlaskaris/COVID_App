@@ -23,7 +23,7 @@ Initially, when launching the application for the first time, a user is prompted
 When launching the application, whether the user is new or not, the Home Screen will eventually be called. Once called, a function is used to determine if the current user is new to the database or not. If the user is new then the user and default values ("admin", "recent survey completed", "name", etc.) are pushed to the database to be accessed throughout the rest of the application. However, if the user is not new then they already exist in the database and their fields are used throughout to determine badge color, admin status and the current status of their survey.<br/>
 <br/>_Use of Navigation Links to Change Views_<br/>
 Navigation Links are used throughout the app to easily transition between multiple screens. For example, to determine when launching the app, the software needs to determine which screen to show the user, either the login screen (the user is either new or signed out) or the Home Screen (bipassing the login screen because the user is already signed in). To decide which screen to show a conditoinal is used ( is the user id empty or not) and upon evaluation of that conditional a Login link is presented to the user that when clicked takes them to the appropriate screen. <br/>
-<br/> _Determining Admin Dashboard Permissions and Pulling Data from the Database<br/>
+<br/> _Determining Admin Dashboard Permissions and Pulling Data from the Database_<br/>
 
 
 # References
