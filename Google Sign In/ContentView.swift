@@ -370,6 +370,8 @@ struct SymptomView: View {
                 if (self.survey.vomit) { badge = "Red" }
                 if (self.survey.fatigue) { badge = "Red" }
                 if (self.survey.aches) { badge = "Red" }
+                
+                let date = Date();
 
 
                 userRef.document(Auth.auth().currentUser!.uid).setData([
@@ -384,6 +386,7 @@ struct SymptomView: View {
                     "vomit": self.survey.vomit,
                     "fatigue": self.survey.fatigue,
                     "aches": self.survey.aches,
+                    "surveySubmitTime": date
                 ])
                 
             }) {
