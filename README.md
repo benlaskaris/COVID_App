@@ -11,7 +11,14 @@ Developed with Swift, SwiftUI, and Google Firebase
 
 # About the Project
 This app was developed for providing BU Terriers the ability to submit their daily symptom survey, find testing locations, and see recent statistics on BU's COVID-19 Campus Plan
+#_Backend Design_#
+
 
 # References
 Splash Screen: <br/>
 https://medium.com/better-programming/creating-an-apple-like-splash-screen-in-swiftui-fdeb36b47e81
+<br/>
+Google Authentication via Firebase:<br/>
+https://www.youtube.com/watch?v=hGDaemst2UA
+Firebase Docs: <br/>
+https://firebase.google.com/docs/auth/ios/google-signin
