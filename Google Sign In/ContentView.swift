@@ -294,7 +294,7 @@ struct HomeView: View {
                 }) {
                     Text("See Historical Data").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$AdminModal) {
-                    AdminView()
+                    AdminView(AdminModal: self.$AdminModal)
                 }
                 
             }
@@ -395,7 +395,7 @@ struct SymptomView: View {
                 ])
                 
             }) {
-                Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
+                Text("Submit").customButton().padding(.vertical, 30).padding(.horizontal)
             }
         }
     }
@@ -497,6 +497,7 @@ struct AdminView: View {
     @State var totalOnTime = 0
     @State var AdminView: Bool = false
     
+    @Binding var AdminModal: Bool
     
     
     @State var Admin: Bool = false
@@ -581,6 +582,12 @@ struct AdminView: View {
                                 }
                             }.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                                 .edgesIgnoringSafeArea(.all).padding(.vertical, 250)
+                            
+                            Button(action: {
+                                self.AdminModal.toggle()
+                            }) {
+                                Text("Return to Home").customButton().padding(.vertical, 90)
+                            }
 
                     }
                 }.padding(.horizontal)
