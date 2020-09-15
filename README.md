@@ -17,7 +17,7 @@ Developed with Swift, SwiftUI, and Google Firebase
 This app was developed for providing BU Terriers the ability to submit their daily symptom survey, find testing locations, and see recent statistics on BU's COVID-19 Campus Plan <br/>
 __**Backend Design**__ <br/>
 _Google Authentication via Google Sign In Button_ <br/>
-Initially, when launching the application for the first time, a user is prompted to sign in using Google. Using the documentation provided by Firebase
+Initially, when launching the application for the first time, a user is prompted to sign in using Google. Using the documentation provided by Firebase and a Youtube tutorial we were able to implement a Google themed button that when used to sign in adds a new authenticated user to the database. The Google sign in knows when to add a new user by searching the current authenticated users in the database and if the email used to sign in does not exist then add them to the authenticated user in the datbase. <br/>
 
 
 # References
