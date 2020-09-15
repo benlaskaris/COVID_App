@@ -15,3 +15,6 @@ This app was developed for providing BU Terriers the ability to submit their dai
 # References
 Splash Screen: <br/>
 https://medium.com/better-programming/creating-an-apple-like-splash-screen-in-swiftui-fdeb36b47e81
+
+Pie Chart Visualizations: <br/>
+https://www.youtube.com/watch?v=7HzE1mHFPZc
