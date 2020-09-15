@@ -3,9 +3,11 @@ Boston University EC 463 - Senior Design I
 
 # Team Composition
 Norman A. Toro Vega - Front-End Development 🎨 <br/>
-<br\>Se'Lina Lasher - Backend Development 💻: <br/>
+<br/>Se'Lina Lasher - Backend Development 💻: <br/>
 -Google Authentication via Google Sign In Button <br/>
 -Automatic User Onboarding into Firebase Data Base <br/>
+-Use of Navigation Links to Change Views<br/>
+-Determining Admin Dashboard Permissions and Pulling Data from the Database<br/>
 <br/>Benjamin Laskaris - Backend Development 💻<br/>
 
 # Software Stack
