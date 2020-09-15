@@ -9,7 +9,10 @@ Norman A. Toro Vega - Front-End Development 🎨 <br/>
 -Use of Navigation Links to Change Views<br/>
 -Determining Admin Dashboard Permissions and Pulling Data from the Database<br/>
 -Assisted Norman Toro Vega: 
+
 <br/>Benjamin Laskaris - Backend Development 💻<br/>
+-Initial database setup and testing <br/>
+-Publish Survey results to Database and use them to set user badge <br/>
 
 # Software Stack
 Developed with Swift, SwiftUI, and Google Firebase
