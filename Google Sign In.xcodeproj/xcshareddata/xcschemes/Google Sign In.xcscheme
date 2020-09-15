@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "8525D80C2509941B00EA3020"
-               BuildableName = "Google Sign In.app"
+               BuildableName = "TerrierCheck.app"
                BlueprintName = "Google Sign In"
                ReferencedContainer = "container:Google Sign In.xcodeproj">
             </BuildableReference>
@@ -65,7 +65,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8525D80C2509941B00EA3020"
-            BuildableName = "Google Sign In.app"
+            BuildableName = "TerrierCheck.app"
             BlueprintName = "Google Sign In"
             ReferencedContainer = "container:Google Sign In.xcodeproj">
          </BuildableReference>
@@ -89,7 +89,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "8525D80C2509941B00EA3020"
-            BuildableName = "Google Sign In.app"
+            BuildableName = "TerrierCheck.app"
             BlueprintName = "Google Sign In"
             ReferencedContainer = "container:Google Sign In.xcodeproj">
          </BuildableReference>

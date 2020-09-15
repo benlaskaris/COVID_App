@@ -40,7 +40,7 @@
 		01DBCF772A8451DCE8F3310F /* Pods-Google Sign In.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Google Sign In.debug.xcconfig"; path = "Target Support Files/Pods-Google Sign In/Pods-Google Sign In.debug.xcconfig"; sourceTree = "<group>"; };
 		123D22DA5117B2C433532303 /* Pods-Google Sign In.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Google Sign In.release.xcconfig"; path = "Target Support Files/Pods-Google Sign In/Pods-Google Sign In.release.xcconfig"; sourceTree = "<group>"; };
 		1BB507820FE3260A7BBE2112 /* Pods_Google_Sign_In.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Google_Sign_In.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8525D80D2509941B00EA3020 /* Google Sign In.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Google Sign In.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8525D80D2509941B00EA3020 /* TerrierCheck.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TerrierCheck.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8525D8102509941B00EA3020 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		8525D8122509941B00EA3020 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		8525D8142509941B00EA3020 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -108,7 +108,7 @@
 		8525D80E2509941B00EA3020 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8525D80D2509941B00EA3020 /* Google Sign In.app */,
+				8525D80D2509941B00EA3020 /* TerrierCheck.app */,
 				8525D8232509941B00EA3020 /* Google Sign InTests.xctest */,
 				8525D82E2509941B00EA3020 /* Google Sign InUITests.xctest */,
 			);
@@ -185,7 +185,7 @@
 			);
 			name = "Google Sign In";
 			productName = "Google Sign In";
-			productReference = 8525D80D2509941B00EA3020 /* Google Sign In.app */;
+			productReference = 8525D80D2509941B00EA3020 /* TerrierCheck.app */;
 			productType = "com.apple.product-type.application";
 		};
 		8525D8222509941B00EA3020 /* Google Sign InTests */ = {
@@ -529,14 +529,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Google Sign In/Preview Content\"";
+				DEVELOPMENT_TEAM = U29W4CF9KG;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Google Sign In/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "temp.Google-Sign-In";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = terriers.terrierCheck;
+				PRODUCT_NAME = TerrierCheck;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -549,14 +550,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Google Sign In/Preview Content\"";
+				DEVELOPMENT_TEAM = U29W4CF9KG;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "Google Sign In/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "temp.Google-Sign-In";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = terriers.terrierCheck;
+				PRODUCT_NAME = TerrierCheck;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

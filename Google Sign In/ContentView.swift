@@ -323,7 +323,7 @@ struct HomeView: View {
                     userRef.document(Auth.auth().currentUser!.uid).setData([
                         "profileName": Auth.auth().currentUser?.displayName as Any,
                         "recentSurvey": false,
-                        "badge": "Red",
+                        "badge": "Yellow",
                         "fever": false,
                         "cough": false,
                         "breathing": false,
@@ -380,7 +380,7 @@ struct SymptomView: View {
 
                 userRef.document(Auth.auth().currentUser!.uid).setData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
-                    "recentSurvey": false,
+                    "recentSurvey": true,
                     "badge": "Red",
                     "fever": self.survey.fever,
                     "cough": self.survey.cough,
@@ -390,13 +390,22 @@ struct SymptomView: View {
                     "vomit": self.survey.vomit,
                     "fatigue": self.survey.fatigue,
                     "aches": self.survey.aches,
-                    "admin": false // this should change - dummy value for now BL 09/14/2020
+                    "admin": false, // this should change - dummy value for now BL 09/14/2020
+                    "dateOfSurvey":Date().string(format: "dd-MM-yyyy")
                 ])
                 
             }) {
                 Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
         }
+    }
+}
+
+extension Date {
+    func string(format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: self)
     }
 }
 
@@ -498,13 +507,17 @@ struct AdminView: View {
                         Text("").onAppear() { self.readDB()
                         }
                         if self.Admin == true{
-
+                                
+                            HStack {
+                                Spacer()
                                 Text("Recent Statistics").font(.largeTitle).bold().padding(.top).onAppear() { self.readStatistics()
-                                }.padding(.leading)
+                                }
+                                Spacer()
+                            }
                             Spacer()
                             
                             if self.AdminView == true {
-                                PieChart()
+                                PieChart(totalGreen: self.$totalGreen, totalRed: self.$totalRed, totalYellow: self.$totalYellow)
                                 
                                 Text("Numerical Data").font(.largeTitle).bold().padding(.vertical)
                                 
@@ -533,7 +546,7 @@ struct AdminView: View {
                                         Text("Total Quarantined").font(.headline).bold()
                                     }
                                     Spacer()
-                                }.padding(.bottom, 18)
+                                }.padding(.bottom, 50)
                                 
                                 HStack {
                                     Spacer()
@@ -608,6 +621,19 @@ struct AdminView: View {
 }
 
 struct PieChart: View {
+    @Binding var totalGreen: Int
+    @Binding var totalRed: Int
+    @Binding var totalYellow: Int
+    @State var totalSurveys: Int = 0
+    //@Binding var totalLate:Int
+    //@Binding var totalOnTime:Int
+    
+    @State var data = [
+        Pie(id: 0, percent: 40, name: "Cleared", color: Color.green),
+        Pie(id: 1, percent: 40, name: "Warning", color: Color.yellow),
+        Pie(id: 2, percent: 20, name: "Quarantine", color: Color.red)
+    ]
+    
     var body: some View {
         VStack {
             
@@ -618,8 +644,9 @@ struct PieChart: View {
             GeometryReader {g in
                 
                 ZStack {
-                    ForEach(0..<data.count) {i in
-                        DrawShape(center: CGPoint(x: g.frame(in: .global).width / 2, y: g.frame(in: .global).width / 2), index: i)
+                    Text("").onAppear(){self.dataFiller()}
+                    ForEach(0..<self.data.count) {i in
+                        DrawShape(data: self.$data, center: CGPoint(x: g.frame(in: .global).width / 2, y: g.frame(in: .global).width / 2), index: i)
                     }
                 }
             }.frame(height: 360)
@@ -628,7 +655,7 @@ struct PieChart: View {
                 .shadow(radius: 8)
             
             VStack {
-                ForEach(data) {i in
+                ForEach(self.data) {i in
                     
                     HStack {
                         
@@ -659,10 +686,19 @@ struct PieChart: View {
         let temp = value / 100
         return temp * width
     }
+    func dataFiller(){
+        self.totalSurveys = totalYellow + totalRed + totalGreen
+        self.data = [
+            Pie(id: 0, percent: CGFloat(Float(totalGreen) / Float(totalSurveys) * 100), name: "Cleared", color: Color.green),
+            Pie(id: 1, percent: CGFloat(Float(totalYellow) / Float(totalSurveys) * 100), name: "Overdue", color: Color.yellow),
+            Pie(id: 2, percent: CGFloat(Float(totalRed) / Float(totalSurveys) * 100), name: "Quarantine", color: Color.red)
+           ]
+    }
 }
 
+
 struct DrawShape: View {
-    
+    @Binding var data: Array<Pie>
     var center: CGPoint
     var index: Int
     var body: some View {
@@ -707,12 +743,6 @@ struct Pie: Identifiable {
     var name: String
     var color: Color
 }
-
-var data = [
-    Pie(id: 0, percent: 70, name: "Cleared", color: Color.green),
-    Pie(id: 1, percent: 20, name: "Warning", color: Color.yellow),
-    Pie(id: 2, percent: 10, name: "Quarantine", color: Color.red)
-]
 
 struct MapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView {
