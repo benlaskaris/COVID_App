@@ -191,13 +191,13 @@ struct GoogleScreen: View{
                 Spacer()
             }
             
-            Text("Please sign-in here. After signing in, press the button at the bottom to enter Home.").font(.headline).padding()
+            Text("Please sign in here. After signing in, press the button at the bottom to enter Home.").font(.headline).padding()
             WrappedViewController()
             
             NavigationLink(destination: HomeView()){
                                     HStack {
                                         Spacer()
-                                        Text("Home").customButton()
+                                        Text("I'm Signed In").customButton()
                                         Spacer()
                                     }.padding(.horizontal)
                 }.navigationBarTitle("").buttonStyle(PlainButtonStyle()).navigationBarHidden(true)
