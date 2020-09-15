@@ -361,11 +361,21 @@ struct SymptomView: View {
                 let db = Firestore.firestore()
                 let userRef = db.collection("users")
                 
+                var badge = "Green"
+                if (self.survey.fever) { badge = "Red" }
+                if (self.survey.cough) { badge = "Red" }
+                if (self.survey.breathing) { badge = "Red" }
+                if (self.survey.throat) { badge = "Red" }
+                if (self.survey.smell) { badge = "Red" }
+                if (self.survey.vomit) { badge = "Red" }
+                if (self.survey.fatigue) { badge = "Red" }
+                if (self.survey.aches) { badge = "Red" }
+
 
                 userRef.document(Auth.auth().currentUser!.uid).setData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
                     "recentSurvey": false,
-                    "badge": "Red",
+                    "badge": badge,
                     "fever": self.survey.fever,
                     "cough": self.survey.cough,
                     "breathing": self.survey.breathing,
@@ -374,7 +384,6 @@ struct SymptomView: View {
                     "vomit": self.survey.vomit,
                     "fatigue": self.survey.fatigue,
                     "aches": self.survey.aches,
-//                    "admin": false // this should change - dummy value for now BL 09/14/2020
                 ])
                 
             }) {
