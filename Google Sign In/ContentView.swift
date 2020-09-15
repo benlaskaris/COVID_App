@@ -300,9 +300,25 @@ struct HomeView: View {
                     //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
                     print("Document data: \(document.data())")
                     
+                    let curDate = Date();
+                    let userDate = document.get("surveySubmitTime") as! Timestamp
+
+                    let diffComponents = Calendar.current.dateComponents([.hour], from: userDate.dateValue(), to: curDate)
+                    let hours = diffComponents.hour
+
+                    if (hours! >= 24)
+                    {
+                        userRef.document(Auth.auth().currentUser!.uid).updateData([
+                           "badge": "Yellow",
+                        ])
+                    }
+                
+                    
                 } else {
                     //                    GIDSignIn.sharedInstance()?.signIn()
                     print("Document does not exist")
+                    
+                    let curDate = Date();
                     
                     userRef.document(Auth.auth().currentUser!.uid).setData([
                         "profileName": Auth.auth().currentUser?.displayName as Any,
@@ -316,7 +332,8 @@ struct HomeView: View {
                         "vomit": false,
                         "fatigue": false,
                         "aches": false,
-                        "admin": false
+                        "admin": false,
+                        "surveySubmitTime": curDate
                         
                     ])
                 }
