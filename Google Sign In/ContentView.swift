@@ -24,6 +24,7 @@ class SurveyAnswers: ObservableObject {
     @Published var vomit: Bool = false
     @Published var fatigue: Bool = false
     @Published var aches: Bool = false
+
 }
 
 
@@ -87,7 +88,7 @@ struct ContentView: View {
 
                             InformationDetailView(title: "Testing Locations", subTitle: "Find the COVID-19 testing location nearest to you to #FlattenTheCurve.", imageName: "mappin.circle")
 
-                            InformationDetailView(title: "COVID-19 Statistics", subTitle: "See a detailed dashboard of all recent COVID-19-related statistics on campus ", imageName: "staroflife")
+                            InformationDetailView(title: "COVID-19 Statistics", subTitle: "See a detailed dashboard of all recent COVID-19-related statistics on campus.", imageName: "staroflife")
                         }
                         
                         Spacer(minLength: 30)
@@ -217,9 +218,11 @@ struct HomeView: View {
     @State var SymptomModal: Bool = false
     @State var TestingModal: Bool = false
     @State var AdminModal: Bool = false
+    @State var SurveyDone: Bool = false
     
-    var status: String = "Cleared"
-    var statusColor: Color = Color.red
+
+    @State var status: String = "Overdue"
+    @State var statusColor: Color = Color.yellow
     
 //    @ObservedObject var survey: SurveyAnswers
     
@@ -261,7 +264,7 @@ struct HomeView: View {
                 }) {
                     Text("Report my symptoms").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$SymptomModal) {
-                    SymptomView(SymptomModal: self.$SymptomModal)
+                    SymptomView(SymptomModal: self.$SymptomModal, statusColor: self.$statusColor, surveyDone: self.$SurveyDone)
                 }
                     
                 
@@ -279,6 +282,9 @@ struct HomeView: View {
                     Text("See Historical Data").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$AdminModal) {
                     AdminView()
+                }
+                if (SurveyDone==true){
+                    Text("").onAppear(){self.DB_Push()}
                 }
                 
             }
@@ -299,6 +305,22 @@ struct HomeView: View {
                 if document.exists {
                     //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
                     print("Document data: \(document.data())")
+                                        let date = document.get("dateOfSurvey") as! String
+                    if (date == Date().string(format: "dd-MM-yyyy")){
+                        let badgeColor = document.get("badge") as! String
+                        if badgeColor == "Red"{
+                            self.statusColor = Color.red
+                            self.status = "Quarantine"
+                        }
+                        else if (badgeColor == "Green"){
+                            self.statusColor = Color.green
+                            self.status = "Cleared"
+                        }
+                        else{
+                            self.statusColor = Color.yellow
+                            self.status = "Overdue"
+                        }
+                    }
                     
                     let curDate = Date();
                     let userDate = document.get("surveySubmitTime") as! Timestamp
@@ -336,6 +358,7 @@ struct HomeView: View {
                         "surveySubmitTime": curDate
                         
                     ])
+                    self.statusColor = Color.yellow
                 }
             }
         }
@@ -347,6 +370,10 @@ struct HomeView: View {
 
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
+    @Binding var statusColor: Color
+    @Binding var surveyDone: Bool
+    
+    @State var buttonPush: Bool = false;
     
     @ObservedObject var survey = SurveyAnswers();
     
@@ -391,9 +418,39 @@ struct SymptomView: View {
                 let date = Date();
 
 
-                userRef.document(Auth.auth().currentUser!.uid).setData([
+                 var badge = "Green"
+                if (self.survey.fever) { badge = "Red" }
+                if (self.survey.cough) { badge = "Red" }
+                if (self.survey.breathing) { badge = "Red" }
+                if (self.survey.throat) { badge = "Red" }
+                if (self.survey.smell) { badge = "Red" }
+                if (self.survey.vomit) { badge = "Red" }
+                if (self.survey.fatigue) { badge = "Red" }
+                if (self.survey.aches) { badge = "Red" }
+                
+                let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+                
+                docRef.getDocument { (document, error) in
+                    if let document = document {
+                        
+                        if document.exists {
+                            //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+                            print("Document data: \(document.data())")
+                            let date = document.get("dateOfSurvey") as! String
+                            if (date == Date().string(format: "dd-MM-yyyy")){
+                                print("less than a day has passed")
+                            }
+                            else{
+                                //                    GIDSignIn.sharedInstance()?.signIn()
+                                print("One Day has Passed")
+                                
+                                userRef.document(Auth.auth().currentUser!.uid).updateData([
                     "profileName": Auth.auth().currentUser?.displayName as Any,
+<<<<<<< Updated upstream
                     "recentSurvey": false,
+=======
+                    "recentSurvey": true,
+>>>>>>> Stashed changes
                     "badge": badge,
                     "fever": self.survey.fever,
                     "cough": self.survey.cough,
@@ -403,13 +460,30 @@ struct SymptomView: View {
                     "vomit": self.survey.vomit,
                     "fatigue": self.survey.fatigue,
                     "aches": self.survey.aches,
+<<<<<<< Updated upstream
                     "surveySubmitTime": date
+=======
+                    //"admin": false, // this should change - dummy value for now BL 09/14/2020
+                    "dateOfSurvey":Date().string(format: "dd-MM-yyyy")
+>>>>>>> Stashed changes
                 ])
+
+                self.surveyDone = true
+                            }
+                            
+                        } else {
+                            print("document does not exist")
+                            
+                        }
+                    }
+                }
                 
             }) {
                 Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
+
         }
+        
     }
 }
 
@@ -573,7 +647,7 @@ struct DetailView: View {
                 Text("Testing Center Information").multilineTextAlignment(.center)
                     .font(.largeTitle).padding(.bottom)
 
-                Text("For more information on testing center hours, procedures, and additional questions, please call Student Health Services at (617) 353-3575")
+                Text("For more information on testing center hours, procedures, and additional questions, please call Student Health Services at (617) 353-3575.")
                     .font(.caption)
             Spacer()
         }.padding().navigationBarHidden(true)
