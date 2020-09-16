@@ -24,6 +24,7 @@ class SurveyAnswers: ObservableObject {
     @Published var vomit: Bool = false
     @Published var fatigue: Bool = false
     @Published var aches: Bool = false
+    
 }
 
 
@@ -176,15 +177,31 @@ extension Color {
 struct GoogleScreen: View{
     var body:some View{
         NavigationView{
-        ZStack{
-            Text("If After Signing In Nothing Occurs, Please Close the App and Try Again")
+        VStack{
+            
+            Text("Sign In").fontWeight(.black)
+                .font(.system(size: 36)).foregroundColor(.black)
+
+            
+            HStack(alignment: .center) {
+                Spacer()
+                Text("Use Your Google Account")
+                .fontWeight(.black)
+                .font(.system(size: 36))
+                .foregroundColor(.red)
+                Spacer()
+            }
+            
+            Text("Please sign in here. After signing in, press the button at the bottom to enter Home.").font(.headline).padding()
             WrappedViewController()
             
-            if Auth.auth().currentUser?.uid != nil{
-                NavigationLink(destination: HomeView()){
-                    Text("Login Sucessful! Proceed to Home...")
-                }
-            }
+            NavigationLink(destination: HomeView()){
+                                    HStack {
+                                        Spacer()
+                                        Text("I'm Signed In").customButton()
+                                        Spacer()
+                                    }.padding(.horizontal)
+                }.navigationBarTitle("").buttonStyle(PlainButtonStyle()).navigationBarHidden(true)
             }
         }
     }
@@ -217,9 +234,11 @@ struct HomeView: View {
     @State var SymptomModal: Bool = false
     @State var TestingModal: Bool = false
     @State var AdminModal: Bool = false
+    @State var SurveyDone: Bool = false
     
-    var status: String = "Cleared"
-    var statusColor: Color = Color.red
+    
+    @State var status: String = "Overdue"
+    @State var statusColor: Color = Color.yellow
     
 //    @ObservedObject var survey: SurveyAnswers
     
@@ -261,7 +280,7 @@ struct HomeView: View {
                 }) {
                     Text("Report my symptoms").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$SymptomModal) {
-                    SymptomView(SymptomModal: self.$SymptomModal)
+                    SymptomView(SymptomModal: self.$SymptomModal, statusColor: self.$statusColor, surveyDone: self.$SurveyDone)
                 }
                     
                 
@@ -279,6 +298,9 @@ struct HomeView: View {
                     Text("See Historical Data").customButton().padding(.horizontal)
                 }.sheet(isPresented: self.$AdminModal) {
                     AdminView()
+                }
+                if (SurveyDone==true){
+                    Text("").onAppear(){self.DB_Push()}
                 }
                 
             }
@@ -299,31 +321,31 @@ struct HomeView: View {
                 if document.exists {
                     //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
                     print("Document data: \(document.data())")
-                    
-                    let curDate = Date();
-                    let userDate = document.get("surveySubmitTime") as! Timestamp
-
-                    let diffComponents = Calendar.current.dateComponents([.hour], from: userDate.dateValue(), to: curDate)
-                    let hours = diffComponents.hour
-
-                    if (hours! >= 24)
-                    {
-                        userRef.document(Auth.auth().currentUser!.uid).updateData([
-                           "badge": "Yellow",
-                        ])
+                    let date = document.get("dateOfSurvey") as! String
+                    if (date == Date().string(format: "dd-MM-yyyy")){
+                        let badgeColor = document.get("badge") as! String
+                        if badgeColor == "Red"{
+                            self.statusColor = Color.red
+                            self.status = "Quarantine"
+                        }
+                        else if (badgeColor == "Green"){
+                            self.statusColor = Color.green
+                            self.status = "Cleared"
+                        }
+                        else{
+                            self.statusColor = Color.yellow
+                            self.status = "Overdue"
+                        }
                     }
-                
                     
                 } else {
                     //                    GIDSignIn.sharedInstance()?.signIn()
                     print("Document does not exist")
                     
-                    let curDate = Date();
-                    
                     userRef.document(Auth.auth().currentUser!.uid).setData([
                         "profileName": Auth.auth().currentUser?.displayName as Any,
                         "recentSurvey": false,
-                        "badge": "Red",
+                        "badge": "Yellow",
                         "fever": false,
                         "cough": false,
                         "breathing": false,
@@ -332,10 +354,10 @@ struct HomeView: View {
                         "vomit": false,
                         "fatigue": false,
                         "aches": false,
-                        "admin": false,
-                        "surveySubmitTime": curDate
+                        "admin": false
                         
                     ])
+                    self.statusColor = Color.yellow
                 }
             }
         }
@@ -347,6 +369,10 @@ struct HomeView: View {
 
 struct SymptomView: View {
     @Binding var SymptomModal: Bool
+    @Binding var statusColor: Color
+    @Binding var surveyDone: Bool
+    
+    @State var buttonPush: Bool = false;
     
     @ObservedObject var survey = SurveyAnswers();
     
@@ -371,12 +397,13 @@ struct SymptomView: View {
             
             CheckView(symptom: "Severe Body Aches", symptomNumber: 8, survey: self.survey)
             
-
-
+            
+            
             Button(action: {
                 self.SymptomModal.toggle()
                 let db = Firestore.firestore()
                 let userRef = db.collection("users")
+                
                 
                 var badge = "Green"
                 if (self.survey.fever) { badge = "Red" }
@@ -388,28 +415,62 @@ struct SymptomView: View {
                 if (self.survey.fatigue) { badge = "Red" }
                 if (self.survey.aches) { badge = "Red" }
                 
-                let date = Date();
-
-
-                userRef.document(Auth.auth().currentUser!.uid).setData([
-                    "profileName": Auth.auth().currentUser?.displayName as Any,
-                    "recentSurvey": false,
-                    "badge": badge,
-                    "fever": self.survey.fever,
-                    "cough": self.survey.cough,
-                    "breathing": self.survey.breathing,
-                    "throat": self.survey.throat,
-                    "smell": self.survey.smell,
-                    "vomit": self.survey.vomit,
-                    "fatigue": self.survey.fatigue,
-                    "aches": self.survey.aches,
-                    "surveySubmitTime": date
-                ])
+                let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
+                
+                docRef.getDocument { (document, error) in
+                    if let document = document {
+                        
+                        if document.exists {
+                            //                    GIDSignIn.sharedInstance()?.restorePreviousSignIn() //RESTORE SIGN IN
+                            print("Document data: \(document.data())")
+                            let date = document.get("dateOfSurvey") as! String
+                            if (date == Date().string(format: "dd-MM-yyyy")){
+                                print("less than a day has passed")
+                            }
+                            else{
+                                //                    GIDSignIn.sharedInstance()?.signIn()
+                                print("One Day has Passed")
+                                
+                                userRef.document(Auth.auth().currentUser!.uid).updateData([
+                                    "profileName": Auth.auth().currentUser?.displayName as Any,
+                                    "recentSurvey": true,
+                                    "badge": badge,
+                                    "fever": self.survey.fever,
+                                    "cough": self.survey.cough,
+                                    "breathing": self.survey.breathing,
+                                    "throat": self.survey.throat,
+                                    "smell": self.survey.smell,
+                                    "vomit": self.survey.vomit,
+                                    "fatigue": self.survey.fatigue,
+                                    "aches": self.survey.aches,
+                                    //"admin": false, // this should change - dummy value for now BL 09/14/2020
+                                    "dateOfSurvey":Date().string(format: "dd-MM-yyyy")
+                                ])
+                                
+                                self.surveyDone = true
+                            }
+                            
+                        } else {
+                            print("document does not exist")
+                            
+                        }
+                    }
+                }
                 
             }) {
                 Text("Submit").font(.title).padding(.horizontal, 60).padding(.vertical, 5).background(Color.blue).foregroundColor(.white).cornerRadius(40).padding(.vertical, 30)
             }
+            
         }
+        
+    }
+}
+
+extension Date {
+    func string(format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: self)
     }
 }
 
@@ -494,19 +555,89 @@ struct TestingView: View {
 }
 
 struct AdminView: View {
+    @State var totalGreen = 0
+    @State var totalRed = 0
+    @State var totalYellow = 0
+    @State var totalLate = 0
+    @State var totalOnTime = 0
+    @State var AdminView: Bool = false
+    
+    
+    
     @State var Admin: Bool = false
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text("").onAppear(){self.readDB()}
-            if self.Admin == true{
-            Text("Welcome to the Admin Dashboard")
-            }
-            else{
-                Text("You Do Not Have the Permission to View the Admin Dashboard")
-            }
+        ScrollView {
+            VStack(alignment: .leading) {
+                        Text("").onAppear() { self.readDB()
+                        }
+                        if self.Admin == true{
+
+                                Text("Recent Statistics").font(.largeTitle).bold().padding(.top).onAppear() { self.readStatistics()
+                                }.padding(.leading)
+                            Spacer()
+                            
+                            if self.AdminView == true {
+                                PieChart(totalGreen: self.$totalGreen, totalRed: self.$totalRed, totalYellow: self.$totalYellow)
+                                
+                                Text("Numerical Data").font(.largeTitle).bold().padding(.vertical)
+                                
+                                HStack {
+                                    Spacer()
+                                    VStack {
+                                        Text("\(self.totalGreen)").font(.largeTitle).bold()
+                                        Text("Total Cleared").font(.headline).bold()
+                                    }
+                                    Spacer()
+                                }.padding(.bottom, 18)
+                                
+                                HStack {
+                                    Spacer()
+                                    VStack {
+                                        Text("\(self.totalYellow)").font(.largeTitle).bold()
+                                        Text("Total Warnings").font(.headline).bold()
+                                    }
+                                    Spacer()
+                                }.padding(.bottom, 18)
+                                
+                                HStack {
+                                    Spacer()
+                                    VStack {
+                                        Text("\(self.totalRed)").font(.largeTitle).bold()
+                                        Text("Total Quarantined").font(.headline).bold()
+                                    }
+                                    Spacer()
+                                }.padding(.bottom, 18)
+                                
+                                HStack {
+                                    Spacer()
+                                    VStack {
+                                        Text("\(self.totalOnTime)").font(.largeTitle).bold()
+                                        Text("Surveys Submitted On Time").font(.headline).bold()
+                                    }
+                                    Spacer()
+                                }.padding(.bottom, 18)
+                                
+                                HStack {
+                                    Spacer()
+                                    VStack {
+                                        Text("\(self.totalLate)").font(.largeTitle).bold()
+                                        Text("Surveys Submitted Late").font(.headline).bold()
+                                    }
+                                    Spacer()
+                                }.padding(.bottom, 18)
+                                
+                                
+                            }
+                        }
+                    else{
+                            Text("You Do Not Have the Permission to View the Admin Dashboard").font(.headline).bold()
+                    }
+                        Spacer()
+                    }.padding(.horizontal)
         }
-    }
+        
+}
     func readDB(){
         let db = Firestore.firestore()
         let docRef = db.collection("users").document(Auth.auth().currentUser!.uid)
@@ -518,6 +649,160 @@ struct AdminView: View {
             }
         }
     }
+    func readStatistics(){
+        
+        let db = Firestore.firestore()
+        db.collection("users").getDocuments { (snapshot, err) in
+            if let err = err {
+                print("Error getting documents: \(err)")
+            } else {
+                self.AdminView = true
+                for document in snapshot!.documents {
+                    let badge = document.get("badge") as! String
+                    let recentSurvey = document.get("recentSurvey") as! Bool
+                    if badge == "Green"{
+                        self.totalGreen = self.totalGreen + 1
+                    }
+                    else if badge == "Red"{
+                        self.totalRed = self.totalRed + 1
+                    }
+                    else if badge == "Yellow"{
+                        self.totalYellow = self.totalYellow + 1
+                    }
+                    if recentSurvey == false {
+                        self.totalLate = self.totalLate + 1
+                    }
+                    else if recentSurvey == true {
+                        self.totalOnTime = self.totalOnTime + 1
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct PieChart: View {
+    @Binding var totalGreen: Int
+    @Binding var totalRed: Int
+    @Binding var totalYellow: Int
+    @State var totalSurveys: Int = 0
+    //@Binding var totalLate:Int
+    //@Binding var totalOnTime:Int
+    
+    @State var data = [
+        Pie(id: 0, percent: 70, name: "Cleared", color: Color.green),
+        Pie(id: 1, percent: 20, name: "Warning", color: Color.yellow),
+        Pie(id: 2, percent: 10, name: "Quarantine", color: Color.red)
+    ]
+    
+    var body: some View {
+        VStack {
+            
+//            ZStack {
+//                Text("Recent Statistics").font(.largeTitle).fontWeight(.bold)
+//            }.padding(.top, UIApplication.shared.windows.first?.safeAreaInsets.top).padding()
+            
+            GeometryReader {g in
+                
+                ZStack {
+                    Text("").onAppear(){self.dataFiller()}
+                    //ForEach(0..<self.data.count) {i in
+                    //    DrawShape(data: self.$data, center: CGPoint(x: g.frame(in: .global).width / 2, y: g.frame(in: .global).width / 2), index: i)
+                    //}
+                }
+            }.frame(height: 360)
+                .padding(.top, 20)
+                .clipShape(Circle())
+                .shadow(radius: 8)
+            
+            VStack {
+                ForEach(self.data) {i in
+                    
+                    HStack {
+                        
+                        Text(i.name).font(.headline).bold().frame(width: 100)
+                        
+                        GeometryReader{g in
+                            
+                            HStack {
+                                
+                                Spacer(minLength: 0)
+                                
+                                Rectangle().fill(i.color).frame(width: self.getWidth(width: g.frame(in: .global).width, value: i.percent),height: 10)
+                                
+                                Text(String(format: "\(i.percent)", "%.0f") + "%").fontWeight(.bold).padding(.leading, 10)
+                            }
+                        }
+                    }.padding(.top, 18)
+                }
+            }.padding()
+            
+            Spacer()
+        }
+        .edgesIgnoringSafeArea(.top)
+    }
+    
+    func getWidth(width: CGFloat, value: CGFloat)-> CGFloat {
+        
+        let temp = value / 100
+        return temp * width
+    }
+    func dataFiller(){
+        //self.totalSurveys = totalYellow + totalRed + totalGreen
+        self.data = [
+            Pie(id: 0, percent: CGFloat(), name: "Cleared", color: Color.green),
+            Pie(id: 1, percent: CGFloat(), name: "Overdue", color: Color.yellow),
+            Pie(id: 2, percent: CGFloat(), name: "Quarantine", color: Color.red)
+           ]
+    }
+}
+
+
+struct DrawShape: View {
+    @Binding var data: Array<Pie>
+    var center: CGPoint
+    var index: Int
+    var body: some View {
+        
+        Path { path in
+            
+            path.move(to: self.center)
+            path.addArc(center: self.center, radius: 180, startAngle: .init(degrees: self.from()), endAngle: .init(degrees: self.to()), clockwise: false)
+        }.fill(data[index].color)
+        
+    }
+    
+    func from()-> Double{
+        if index == 0 {
+            return 0
+        } else {
+            var temp: Double = 0
+            
+            for i in 0...index-1 {
+                temp += Double(data[i].percent / 100) * 360
+            }
+            
+            return temp
+        }
+        
+    }
+    
+    func to()-> Double {
+          var temp: Double = 0
+            
+            for i in 0...index {
+                temp += Double(data[i].percent / 100) * 360
+            }
+            
+            return temp
+        }
+    }
+
+struct Pie: Identifiable {
+    var id: Int
+    var percent: CGFloat
+    var name: String
+    var color: Color
 }
 
 struct MapView: UIViewRepresentable {
@@ -642,10 +927,10 @@ class LoginViewController: UIViewController{
         let screenHeight = self.view.frame.size.height
         
         let height : CGFloat = 40.0
-        let width : CGFloat = 260.0
+        let width : CGFloat = 300.0
         
-        let button = UIButton(frame: CGRect(x: 100,
-                                            y: 100,
+        let button = UIButton(frame: CGRect(x: 65,
+                                            y: 0,
                                             width: width,
             height: height))
         
