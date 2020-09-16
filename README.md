@@ -22,14 +22,19 @@ This app was developed for providing BU Terriers the ability to submit their dai
 <br/>__**Front-End Design**__ <br/>
 <br/>_Splash Screen_<br/>
 The app was developed on SwiftUI mainly for its ease-of-use when creating User Interfaces. The Splash Screen showcases the BU Logo (which may be replaced by a propietary application logo in the future) and some information on the basics of what the app can accomplish. The app has functionalities for submitting your daily synmptom screening, finding testing locations, and seeing statistics on recent COVID surveys submitted by the population.
+
 <br/>_Home View_<br/>
 The Home View showcases the user's compliance checkmark, which will become green if they submitted their daily symptom report and have no symptoms, yellow if they are overdue on their survey, and red if they have reported any symptoms which require urgent medical attention. There are buttons for every corresponding feature of the application, which start a modal popup using Boolean toggle functions.
+
 <br/>_Symptom Survey_<br/>
 The symptom survey uses checkboxes, vertical stacks and horizontal stacks to provide the user a list of symptoms in which they can list out. This is tied to the database upon pressing the submit button shown below.
+
 <br/>_Testing Locations_<br/>
 For the testing locations, a MapView is used to showcase Boston University's Charles River Campus and the Medical Campus. A subview with testing locations and information on where to contact to obtain one is included. The points of interest are added individually, using a MapAnnotation.
+
 <br/>_Historical Data_<br/>
 The Historical Data view is only accessible by users that have a "true" set on their database item. If they don't have permission to view this, a view comes up telling them to contact their local IT department for further assistance. If they are an admin, they are able to see a PieChart View that contains a distribution of how many of the current day's surveys were completed with no symptoms, how many are overdue, and how many have to quarantine. The information is also displayed numerically below.
+
 <br/>__**Backend Design**__ <br/>
 <br/>_Google Authentication via Google Sign In Button_ <br/>
 Initially, when launching the application for the first time, a user is prompted to sign in using Google. Using the documentation provided by Firebase and a Youtube tutorial we were able to implement a Google themed button that when used to sign in adds a new authenticated user to the database. The Google sign in knows when to add a new user by searching the current authenticated users in the database and if the email used to sign in does not exist then add them to the authenticated user in the datbase. <br/>
