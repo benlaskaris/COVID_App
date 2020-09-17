@@ -2,7 +2,7 @@
 Boston University EC 463 - Senior Design I
 
 # Download
-1. On your iPhone, go to udid.io <br/>
+1. On your iPhone, go to https://tinyurl.com/getmyudid <br/>
 2. Tap on “Tap to find UDID” <br/>
 3. Tap on “Allow” <br/>
 4. Go to the Settings App <br/>
