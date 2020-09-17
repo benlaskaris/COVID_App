@@ -2,7 +2,7 @@
 Boston University EC 463 - Senior Design I
 
 # Download
-Download the beta for iOS Devices here: https://tinyurl.com/terriercheck
+Download the beta for iOS Devices here: https://tinyurl.com/terriercheck <br/>
 Note: You must open the link directly from an iOS Device.
 
 # Team Composition
