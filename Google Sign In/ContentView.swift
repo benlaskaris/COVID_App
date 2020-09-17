@@ -354,7 +354,8 @@ SymptomView(SymptomModal: self.$SymptomModal, statusColor: self.$statusColor, su
                         "vomit": false,
                         "fatigue": false,
                         "aches": false,
-                        "admin": false
+                        "admin": false,
+                        "dateOfSurvey": "01-09-2020"
                         
                     ])
                     self.statusColor = Color.yellow
