@@ -11,8 +11,8 @@ Norman A. Toro Vega - Front-End Development 🎨 <br/>
 -Assisted Norman Toro Vega: 
 
 <br/>Benjamin Laskaris - Backend Development 💻 <br/>
--Initial database setup and testing <br/>
--Publish and retrieve survey results to/from Database <br/>
+-Initial Firebase setup and testing <br/>
+-Publish and retrieve survey results to/from database <br/>
 -Use survey results to set user status badge <br/>
 -Push timestamp of survey submission to Firebase to keep track of when next survey is due <br/>
 
