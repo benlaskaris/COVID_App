@@ -2,19 +2,26 @@
 Boston University EC 463 - Senior Design I
 
 # Team Composition
-Norman A. Toro Vega - Front-End Development 🎨 <br/>
+<br/>Norman A. Toro Vega - Front-End Development 🎨 <br/>
+- Created SwiftUI Views for every page
+- Created a SwiftUI Checkbox Form for Daily Symptom Surveys
+- Implemented MapViews for Testing Locations
+- Implemented a PieChart Shape for Historical Data & Statistics
+- Designed App Logo
+- Developed App Walkthrough Video
+
 <br/>Se'Lina Lasher - Backend Development 💻 <br/>
--Google Authentication via Google Sign In Button <br/>
--Automatic User Onboarding into Firebase Database <br/>
--Use of Navigation Links to Change Views<br/>
--Determining Admin Dashboard Permissions and Pulling Data from the Database<br/>
--Assisted Norman Toro Vega: 
+- Google Authentication via Google Sign In Button <br/>
+- Automatic User Onboarding into Firebase Database <br/>
+- Use of Navigation Links to Change Views<br/>
+- Determining Admin Dashboard Permissions and Pulling Data from the Database<br/>
+- Assisted Norman Toro Vega
 
 <br/>Benjamin Laskaris - Backend Development 💻 <br/>
--Initial Firebase setup and testing <br/>
--Publish and retrieve survey results to/from database <br/>
--Use survey results to set user status badge <br/>
--Push timestamp of survey submission to Firebase to keep track of when next survey is due <br/>
+- Initial Firebase setup and testing <br/>
+- Publish and retrieve survey results to/from database <br/>
+- Use survey results to set user status badge <br/>
+- Push timestamp of survey submission to Firebase to keep track of when next survey is due <br/>
 
 # Software Stack
 Developed with Swift, SwiftUI, and Google Firebase
