@@ -2,8 +2,17 @@
 Boston University EC 463 - Senior Design I
 
 # Download
-Download the beta for iOS Devices here: https://tinyurl.com/terriercheck <br/>
-Note: You must open the link directly from an iOS Device.
+1. On your iPhone, go to udid.io <br/>
+2. Tap on “Tap to find UDID” <br/>
+3. Tap on “Allow” <br/>
+4. Go to the Settings App <br/>
+5. Tap on “Profile Downloaded” <br/>
+6. Tap on Install <br/>
+7. Copy paste the “UDID” number and send that to normant@bu.edu <br/>
+
+After you are added to our Developer Account, you can download the app here: <br/>
+https://tinyurl.com/terriercheck <br/>
+Note: You must open the link directly from an iOS Device and wait to be given access before being able to install it.
 
 # Team Composition
 <br/>Norman A. Toro Vega - Front-End Development 🎨 <br/>
