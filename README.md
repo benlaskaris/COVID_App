@@ -1,6 +1,10 @@
 # Terrier COVID-19 Symptom Attestation App
 Boston University EC 463 - Senior Design I
 
+# Download
+Download the beta for iOS Devices here: https://tinyurl.com/terriercheck
+Note: You must open the link directly from an iOS Device.
+
 # Team Composition
 <br/>Norman A. Toro Vega - Front-End Development 🎨 <br/>
 - Created SwiftUI Views for every page
