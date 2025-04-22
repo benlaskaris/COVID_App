@@ -8,7 +8,7 @@ Boston University EC 463 - Senior Design I
 4. Go to the Settings App <br/>
 5. Tap on “Profile Downloaded” <br/>
 6. Tap on Install <br/>
-7. Copy & paste the “UDID” number and send that to normant@bu.edu <br/>
+7. Copy & paste the “UDID” number and send that to <redacted> <br/>
 
 After you are added to our Developer Account, you can download the app here: <br/>
 https://tinyurl.com/terriercheck <br/>
